@@ -70,6 +70,26 @@ export default function Dashboard() {
         </div>
       </div>
 
+      {user?.role === 'admin' && (
+        <div style={{ background:'linear-gradient(135deg, #1a1a2e, #16213e)', color:'white', padding:'1.5rem', borderRadius:'12px', marginBottom:'2rem' }}>
+          <h2 style={{ fontWeight:'700', marginBottom:'1rem', fontSize:'1.2rem' }}>Admin Panel</h2>
+          <div className="grid-3">
+            <div style={{ background:'rgba(255,255,255,0.1)', padding:'1rem', borderRadius:'8px', textAlign:'center' }}>
+              <div style={{ fontSize:'2rem', fontWeight:'700', color:'#e94560' }}>{stats.critical}</div>
+              <div style={{ fontSize:'0.85rem', color:'#aaa' }}>Critical Issues</div>
+            </div>
+            <div style={{ background:'rgba(255,255,255,0.1)', padding:'1rem', borderRadius:'8px', textAlign:'center' }}>
+              <div style={{ fontSize:'2rem', fontWeight:'700', color:'#f59e0b' }}>{stats.new}</div>
+              <div style={{ fontSize:'0.85rem', color:'#aaa' }}>Awaiting Action</div>
+            </div>
+            <div style={{ background:'rgba(255,255,255,0.1)', padding:'1rem', borderRadius:'8px', textAlign:'center' }}>
+              <div style={{ fontSize:'2rem', fontWeight:'700', color:'#10b981' }}>{stats.total > 0 ? Math.round((stats.resolved/stats.total)*100) : 0}%</div>
+              <div style={{ fontSize:'0.85rem', color:'#aaa' }}>Resolution Rate</div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {stats.critical > 0 && (
         <div style={{ background:'#7f1d1d', color:'white', padding:'1rem 1.5rem', borderRadius:'12px', marginBottom:'1.5rem', display:'flex', alignItems:'center', gap:'1rem' }}>
           <span style={{ fontSize:'1.5rem' }}>🚨</span>
