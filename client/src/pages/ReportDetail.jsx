@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
+import LocationMap from '../components/LocationMap';
 
 export default function ReportDetail() {
   const { id } = useParams();
@@ -166,13 +167,16 @@ export default function ReportDetail() {
               ))}
             </div>
           </div>
-          <div className="card" style={{ background:'#eff6ff', border:'1px solid #bfdbfe' }}>
+          <div className="card" style={{ background:'#eff6ff', border:'1px solid #bfdbfe', marginBottom:'1rem' }}>
             <h3 style={{ fontWeight:'700', marginBottom:'0.75rem', color:'#1e40af' }}>Timeline</h3>
             <div style={{ fontSize:'0.9rem', color:'#1e40af' }}>
               <div style={{ marginBottom:'0.5rem' }}><strong>Submitted:</strong> {new Date(report.createdAt).toLocaleString()}</div>
               <div style={{ marginBottom:'0.5rem' }}><strong>Last Updated:</strong> {new Date(report.updatedAt).toLocaleString()}</div>
               {report.resolvedAt && <div><strong>Resolved:</strong> {new Date(report.resolvedAt).toLocaleString()}</div>}
             </div>
+          </div>
+          <div className="card">
+            <LocationMap building={report.building} />
           </div>
         </div>
       </div>
