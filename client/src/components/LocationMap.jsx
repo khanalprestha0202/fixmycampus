@@ -1,6 +1,3 @@
-import { useEffect, useRef } from 'react';
-import LocationMap from '../components/LocationMap';
-
 export default function LocationMap({ building }) {
   const buildings = {
     'Main Building': [51.505, -0.09],
@@ -19,7 +16,7 @@ export default function LocationMap({ building }) {
 
   return (
     <div style={{ marginTop:'1rem' }}>
-      <h3 style={{ fontWeight:'700', marginBottom:'0.75rem', color:'#1e40af' }}>📍 Building Location</h3>
+      <h3 style={{ fontWeight:'700', marginBottom:'0.75rem', color:'#1e40af' }}>Building Location</h3>
       <iframe
         width="100%"
         height="200"
