@@ -7,18 +7,28 @@ import { useAuth } from '../context/AuthContext';
 export default function Reports() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ status:'', category:'', building:'', priority:'' });
+  const [filters, setFilters] = useState({ status:'', category:'', priority:'', search:'' });
   const { token } = useAuth();
   const navigate = useNavigate();
 
   const fetchReports = async () => {
     try {
       const params = new URLSearchParams();
-      Object.entries(filters).forEach(([k,v]) => { if(v) params.append(k,v); });
+      if (filters.status) params.append('status', filters.status);
+      if (filters.category) params.append('category', filters.category);
+      if (filters.priority) params.append('priority', filters.priority);
       const res = await axios.get(`http://localhost:5000/api/reports?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setReports(res.data);
+      let data = res.data;
+      if (filters.search) {
+        data = data.filter(r =>
+          r.title.toLowerCase().includes(filters.search.toLowerCase()) ||
+          r.description.toLowerCase().includes(filters.search.toLowerCase()) ||
+          r.building.toLowerCase().includes(filters.search.toLowerCase())
+        );
+      }
+      setReports(data);
     } catch { toast.error('Failed to load reports'); }
     finally { setLoading(false); }
   };
@@ -71,6 +81,13 @@ export default function Reports() {
       </div>
 
       <div className="filter-bar">
+        <input
+          type="text"
+          placeholder="Search reports..."
+          value={filters.search}
+          onChange={e => setFilters({...filters, search:e.target.value})}
+          style={{ flex:1, minWidth:'200px' }}
+        />
         <select value={filters.status} onChange={e => setFilters({...filters, status:e.target.value})}>
           <option value="">All Statuses</option>
           <option>New</option><option>In Progress</option><option>Resolved</option><option>Closed</option>
@@ -83,7 +100,7 @@ export default function Reports() {
           <option value="">All Priorities</option>
           <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
         </select>
-        <button className="btn btn-secondary" onClick={() => setFilters({ status:'', category:'', building:'', priority:'' })}>Clear</button>
+        <button className="btn btn-secondary" onClick={() => setFilters({ status:'', category:'', priority:'', search:'' })}>Clear</button>
       </div>
 
       {loading ? <div className="loading">Loading reports...</div> : (
