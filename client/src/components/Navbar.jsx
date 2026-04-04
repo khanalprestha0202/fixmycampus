@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import toast from 'react-hot-toast';
+import Notifications from './Notifications';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -24,6 +25,7 @@ export default function Navbar() {
         <Link to="/reports/new" className={isActive('/reports/new')}>New Report</Link>
         <Link to="/analytics" className={isActive('/analytics')}>Analytics</Link>
         <Link to="/guidance" className={isActive('/guidance')}>Guidance</Link>
+        <Notifications />
         <span style={{color:'#aaa', fontSize:'0.85rem'}}>{user?.name}</span>
         <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
       </div>
