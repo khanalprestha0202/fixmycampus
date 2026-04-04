@@ -4,6 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import LocationMap from '../components/LocationMap';
+import PDFExport from '../components/PDFExport';
 
 export default function ReportDetail() {
   const { id } = useParams();
@@ -78,7 +79,10 @@ export default function ReportDetail() {
             <span className="badge" style={{ background:'#f3f4f6', color:'#374151' }}>{report.category}</span>
           </div>
         </div>
-        <button className="btn btn-warning" onClick={() => setEditing(!editing)}>Edit</button>
+        <div style={{ display:'flex', gap:'0.5rem' }}>
+          <button className="btn btn-warning" onClick={() => setEditing(!editing)}>Edit</button>
+          <PDFExport report={report} />
+        </div>
       </div>
 
       <div className="grid-2" style={{ alignItems:'start' }}>
