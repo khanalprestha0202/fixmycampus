@@ -1,0 +1,181 @@
+import { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
+
+export default function ReportDetail() {
+  const { id } = useParams();
+  const { token, user } = useAuth();
+  const navigate = useNavigate();
+  const [report, setReport] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [comment, setComment] = useState('');
+  const [editing, setEditing] = useState(false);
+  const [editForm, setEditForm] = useState({});
+
+  useEffect(() => {
+    axios.get(`http://localhost:5000/api/reports/${id}`, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).then(res => { setReport(res.data); setEditForm(res.data); setLoading(false); })
+      .catch(() => { toast.error('Report not found'); navigate('/reports'); });
+  }, [id]);
+
+  const handleStatusChange = async (status) => {
+    try {
+      const res = await axios.put(`http://localhost:5000/api/reports/${id}`, { status }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setReport(res.data);
+      toast.success('Status updated to ' + status);
+    } catch { toast.error('Failed to update status'); }
+  };
+
+  const handleAddComment = async (e) => {
+    e.preventDefault();
+    if (!comment.trim()) return;
+    try {
+      const res = await axios.post(`http://localhost:5000/api/reports/${id}/comments`,
+        { text: comment, addedBy: user?.name },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setReport(res.data);
+      setComment('');
+      toast.success('Comment added');
+    } catch { toast.error('Failed to add comment'); }
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.put(`http://localhost:5000/api/reports/${id}`, editForm, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setReport(res.data);
+      setEditing(false);
+      toast.success('Report updated');
+    } catch { toast.error('Failed to update'); }
+  };
+
+  if (loading) return <div className="loading">Loading report...</div>;
+  if (!report) return null;
+
+  const getBadge = (status) => {
+    const map = { 'New':'badge-new', 'In Progress':'badge-progress', 'Resolved':'badge-resolved', 'Closed':'badge-closed' };
+    return `badge ${map[status] || 'badge-closed'}`;
+  };
+
+  return (
+    <div className="container">
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'1.5rem', flexWrap:'wrap', gap:'1rem' }}>
+        <div>
+          <button className="btn btn-secondary" onClick={() => navigate('/reports')} style={{ marginBottom:'0.5rem' }}>Back</button>
+          <h1 className="page-title">{report.title}</h1>
+          <div style={{ display:'flex', gap:'0.5rem', flexWrap:'wrap' }}>
+            <span className={getBadge(report.status)}>{report.status}</span>
+            <span className={`badge badge-${report.priority.toLowerCase()}`}>{report.priority}</span>
+            <span className="badge" style={{ background:'#f3f4f6', color:'#374151' }}>{report.category}</span>
+          </div>
+        </div>
+        <button className="btn btn-warning" onClick={() => setEditing(!editing)}>Edit</button>
+      </div>
+
+      <div className="grid-2" style={{ alignItems:'start' }}>
+        <div>
+          {editing ? (
+            <div className="card" style={{ marginBottom:'1rem' }}>
+              <h3 style={{ fontWeight:'700', marginBottom:'1rem' }}>Edit Report</h3>
+              <form onSubmit={handleEdit}>
+                <div className="form-group">
+                  <label>Title</label>
+                  <input value={editForm.title} onChange={e => setEditForm({...editForm, title:e.target.value})} />
+                </div>
+                <div className="form-group">
+                  <label>Description</label>
+                  <textarea value={editForm.description} onChange={e => setEditForm({...editForm, description:e.target.value})} rows={3} />
+                </div>
+                <div className="grid-2">
+                  <div className="form-group">
+                    <label>Status</label>
+                    <select value={editForm.status} onChange={e => setEditForm({...editForm, status:e.target.value})}>
+                      <option>New</option><option>In Progress</option><option>Resolved</option><option>Closed</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Priority</label>
+                    <select value={editForm.priority} onChange={e => setEditForm({...editForm, priority:e.target.value})}>
+                      <option>Low</option><option>Medium</option><option>High</option><option>Critical</option>
+                    </select>
+                  </div>
+                </div>
+                <div style={{ display:'flex', gap:'0.5rem' }}>
+                  <button type="submit" className="btn btn-primary">Save</button>
+                  <button type="button" className="btn btn-secondary" onClick={() => setEditing(false)}>Cancel</button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <div className="card" style={{ marginBottom:'1rem' }}>
+              <h3 style={{ fontWeight:'700', marginBottom:'1rem' }}>Report Details</h3>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:'1rem', marginBottom:'1rem' }}>
+                <div><div style={{ color:'#666', fontSize:'0.85rem' }}>Building</div><div style={{ fontWeight:'600' }}>{report.building}</div></div>
+                <div><div style={{ color:'#666', fontSize:'0.85rem' }}>Location</div><div style={{ fontWeight:'600' }}>{report.location}</div></div>
+                <div><div style={{ color:'#666', fontSize:'0.85rem' }}>Reported By</div><div style={{ fontWeight:'600' }}>{report.reportedBy}</div></div>
+                <div><div style={{ color:'#666', fontSize:'0.85rem' }}>Date</div><div style={{ fontWeight:'600' }}>{new Date(report.createdAt).toLocaleDateString()}</div></div>
+              </div>
+              <div style={{ marginBottom:'1rem' }}>
+                <div style={{ color:'#666', fontSize:'0.85rem', marginBottom:'0.3rem' }}>Description</div>
+                <div style={{ background:'#f8f9fa', padding:'1rem', borderRadius:'8px', lineHeight:'1.6' }}>{report.description}</div>
+              </div>
+              {report.photoUrl && (
+                <div><div style={{ color:'#666', fontSize:'0.85rem', marginBottom:'0.3rem' }}>Photo</div>
+                  <a href={report.photoUrl} target="_blank" rel="noreferrer" style={{ color:'#e94560' }}>View Photo</a>
+                </div>
+              )}
+            </div>
+          )}
+
+          <div className="card">
+            <h3 style={{ fontWeight:'700', marginBottom:'1rem' }}>Comments ({report.comments?.length || 0})</h3>
+            {report.comments?.map((c, i) => (
+              <div key={i} style={{ background:'#f8f9fa', padding:'0.75rem', borderRadius:'8px', marginBottom:'0.5rem' }}>
+                <div style={{ fontWeight:'600', fontSize:'0.85rem', color:'#e94560' }}>{c.addedBy}</div>
+                <div style={{ marginTop:'0.25rem' }}>{c.text}</div>
+                <div style={{ fontSize:'0.75rem', color:'#999', marginTop:'0.25rem' }}>{new Date(c.addedAt).toLocaleString()}</div>
+              </div>
+            ))}
+            <form onSubmit={handleAddComment} style={{ marginTop:'1rem' }}>
+              <div className="form-group">
+                <textarea value={comment} onChange={e => setComment(e.target.value)}
+                  placeholder="Add a comment..." rows={2} />
+              </div>
+              <button type="submit" className="btn btn-primary">Add Comment</button>
+            </form>
+          </div>
+        </div>
+
+        <div>
+          <div className="card" style={{ marginBottom:'1rem' }}>
+            <h3 style={{ fontWeight:'700', marginBottom:'1rem' }}>Update Status</h3>
+            <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
+              {['New', 'In Progress', 'Resolved', 'Closed'].map(s => (
+                <button key={s} className={`btn ${report.status === s ? 'btn-primary' : 'btn-outline'}`}
+                  onClick={() => handleStatusChange(s)}>
+                  {report.status === s ? '✓ ' : ''}{s}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="card" style={{ background:'#eff6ff', border:'1px solid #bfdbfe' }}>
+            <h3 style={{ fontWeight:'700', marginBottom:'0.75rem', color:'#1e40af' }}>Timeline</h3>
+            <div style={{ fontSize:'0.9rem', color:'#1e40af' }}>
+              <div style={{ marginBottom:'0.5rem' }}><strong>Submitted:</strong> {new Date(report.createdAt).toLocaleString()}</div>
+              <div style={{ marginBottom:'0.5rem' }}><strong>Last Updated:</strong> {new Date(report.updatedAt).toLocaleString()}</div>
+              {report.resolvedAt && <div><strong>Resolved:</strong> {new Date(report.resolvedAt).toLocaleString()}</div>}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
