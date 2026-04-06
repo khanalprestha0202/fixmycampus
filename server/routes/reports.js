@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Report = require('../models/Report');
 const jwt = require('jsonwebtoken');
+const { sendStatusUpdateEmail } = require('../utils/emailService');
 
 const auth = (req, res, next) => {
   const token = req.headers.authorization?.split(' ')[1];
@@ -82,6 +83,28 @@ router.put('/:id', auth, async (req, res) => {
     }
     res.json(report);
   } catch (err) { res.status(500).json({ message: err.message }); }
+});
+
+router.put('/:id/status', async (req, res) => {
+  try {
+    const { status } = req.body;
+    const report = await Report.findById(req.params.id);
+    if (!report) return res.status(404).json({ message: 'Report not found' });
+
+    report.status = status;
+    await report.save();
+
+    await sendStatusUpdateEmail(
+      report.title,
+      report.reporterEmail || report.email,
+      status,
+      report._id
+    );
+
+    res.json(report);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
 });
 
 router.post('/:id/comments', auth, async (req, res) => {
