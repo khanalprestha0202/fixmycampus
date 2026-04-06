@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-  "start": "node index.js",
-  "dev": "node index.js"
-},
+    "start": "node index.js",
+    "dev": "node index.js"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -20,5 +20,8 @@
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.3.3",
     "nodemailer": "^8.0.4"
+  },
+  "devDependencies": {
+    "@ljharb/tsconfig": "^0.3.2"
   }
 }
