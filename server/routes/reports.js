@@ -12,7 +12,25 @@ const auth = (req, res, next) => {
   } catch { res.status(401).json({ message: 'Invalid token' }); }
 };
 
-// Analytics - MUST be before /:id
+const adminOnly = (req, res, next) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ message: 'Admin access required' });
+  next();
+};
+
+const validateReport = (req, res, next) => {
+  const { title, category, building, location, description, reportedBy, email } = req.body;
+  const errors = [];
+  if (!title || title.trim().length < 3) errors.push('Title must be at least 3 characters');
+  if (!category) errors.push('Category is required');
+  if (!building) errors.push('Building is required');
+  if (!location || location.trim().length < 2) errors.push('Location is required');
+  if (!description || description.trim().length < 10) errors.push('Description must be at least 10 characters');
+  if (!reportedBy) errors.push('Reporter name is required');
+  if (!email || !/^\S+@\S+\.\S+$/.test(email)) errors.push('Valid email is required');
+  if (errors.length > 0) return res.status(400).json({ message: errors.join(', ') });
+  next();
+};
+
 router.get('/stats/analytics', auth, async (req, res) => {
   try {
     const total = await Report.countDocuments();
@@ -24,7 +42,6 @@ router.get('/stats/analytics', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// Get all reports
 router.get('/', auth, async (req, res) => {
   try {
     const { status, category, building, priority } = req.query;
@@ -38,7 +55,6 @@ router.get('/', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// Get single report
 router.get('/:id', auth, async (req, res) => {
   try {
     const report = await Report.findById(req.params.id);
@@ -47,15 +63,13 @@ router.get('/:id', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// Create report
-router.post('/', auth, async (req, res) => {
+router.post('/', auth, validateReport, async (req, res) => {
   try {
     const report = await Report.create(req.body);
     res.status(201).json(report);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// Update report
 router.put('/:id', auth, async (req, res) => {
   try {
     const update = req.body;
@@ -65,7 +79,6 @@ router.put('/:id', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// Add comment
 router.post('/:id/comments', auth, async (req, res) => {
   try {
     const report = await Report.findById(req.params.id);
@@ -75,7 +88,6 @@ router.post('/:id/comments', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-// Delete report
 router.delete('/:id', auth, async (req, res) => {
   try {
     await Report.findByIdAndDelete(req.params.id);

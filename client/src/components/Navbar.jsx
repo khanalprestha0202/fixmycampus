@@ -24,8 +24,7 @@ export default function Navbar() {
         <Link to="/reports" className={isActive('/reports')}>Reports</Link>
         <Link to="/reports/new" className={isActive('/reports/new')}>New Report</Link>
         <Link to="/analytics" className={isActive('/analytics')}>Analytics</Link>
-        <Link to="/guidance" className={isActive('/guidance')}>Guidance</Link>
-        <span style={{color:'#aaa', fontSize:'0.85rem'}}>{user?.name}</span>
+        <Link to="/guidance" className={isActive('/guidance')}>Guidance</Link>       
         <button className="btn btn-outline" onClick={handleLogout}>Logout</button>
       </div>
     </nav>
