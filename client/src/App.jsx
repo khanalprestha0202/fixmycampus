@@ -10,6 +10,7 @@ import NewReport from './pages/NewReport';
 import ReportDetail from './pages/ReportDetail';
 import Analytics from './pages/Analytics';
 import Guidance from './pages/Guidance';
+import NotFound from './pages/NotFound';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -34,6 +35,7 @@ function App() {
               <Route path="/reports/:id" element={<ReportDetail />} />
               <Route path="/analytics" element={<Analytics />} />
               <Route path="/guidance" element={<Guidance />} />
+              <Route path="*" element={<NotFound />} />
             </Routes>
           </PrivateRoute>
         } />
