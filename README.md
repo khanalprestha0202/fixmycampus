@@ -1,124 +1,107 @@
-# FixMyCampus
+# FixMyCampus - Campus Maintenance Reporting Platform
 
-FixMyCampus is a full-stack web application designed for campus maintenance and issue reporting. Students and staff can submit reports about campus issues (e.g., broken facilities, cleanliness problems), track them, view analytics, and receive guidance. Features include interactive maps for location pinning, PDF exports, email notifications, and admin dashboards.
+A full-stack web application for reporting and tracking campus maintenance issues.
 
-## ✨ Features
+## Features
+- Submit and track maintenance reports
+- Real-time status updates with email notifications
+- Analytics dashboard with charts
+- Role-based access (Admin/User)
+- OpenStreetMap building location viewer
+- PDF and CSV export
+- JWT authentication with BCrypt password hashing
+- Rate limiting and security headers
 
-- **User Authentication**: Secure login/register with JWT and bcrypt.
-- **Report Management**: Create, view, update, and delete maintenance reports with images/locations.
-- **Interactive Map**: Pin issues on campus map (LocationMap component).
-- **Analytics Dashboard**: Visualize report trends using Recharts.
-- **Guidance System**: AI-powered or rule-based maintenance guidance.
-- **Notifications & Emails**: Real-time toast notifications and email alerts via Nodemailer.
-- **PDF Export**: Download reports as PDFs.
-- **Responsive UI**: Modern React interface with routing and context management.
-- **Security**: Helmet, CORS, rate-limiting, MongoDB sanitization.
+## Tech Stack
+- **Frontend:** React, React Router, Recharts, Axios
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB with Mongoose
+- **Security:** JWT, BCrypt, Helmet.js, express-rate-limit
+- **External API:** OpenStreetMap
 
-## 🛠️ Tech Stack
-
-| Frontend | Backend | Database | Other |
-|----------|---------|----------|-------|
-| React 19 | Node.js / Express 5 | MongoDB | Vite, Axios, Recharts, Nodemailer, JWT |
-| Vite | Mongoose | | react-hot-toast, react-router-dom |
-
-## 🚀 Quick Start
+## Installation
 
 ### Prerequisites
-- Node.js (18+)
+- Node.js v18+
 - MongoDB (local or Atlas)
-- `.env` file (see below)
 
-### 1. Clone & Install
-```bash
-git clone <repo>
+### Setup
+
+1. Clone the repository:
+\`\`\`
+git clone https://github.com/khanalprestha0202/fixmycampus.git
 cd fixmycampus
-```
+\`\`\`
 
-### 2. Environment Setup
-Create `.env` in root:
-```
-MONGO_URI=mongodb://localhost:27017/fixmycampus
-PORT=5000
-CLIENT_URL=http://localhost:5173
-JWT_SECRET=your_jwt_secret
-EMAIL_HOST=smtp.gmail.com
-EMAIL_PORT=587
-EMAIL_USER=your_email@gmail.com
-EMAIL_PASS=your_app_password
-```
-
-### 3. Install Dependencies
-```bash
-# Root (optional concurrent scripts)
-npm install
-
-# Backend
+2. Install server dependencies:
+\`\`\`
 cd server
 npm install
+\`\`\`
 
-# Frontend
+3. Install client dependencies:
+\`\`\`
 cd ../client
 npm install
-```
+\`\`\`
 
-### 4. Run the App
-```bash
-# Terminal 1: Backend
+4. Create server/.env file:
+\`\`\`
+PORT=5000
+MONGO_URI=mongodb://localhost:27017/fixmycampus
+JWT_SECRET=your_secret_key
+CLIENT_URL=http://localhost:5173
+EMAIL_USER=your_email@gmail.com
+EMAIL_PASS=your_app_password
+\`\`\`
+
+5. Start MongoDB service:
+\`\`\`
+net start MongoDB
+\`\`\`
+
+6. Start the server:
+\`\`\`
 cd server
-npm run dev
+node index.js
+\`\`\`
 
-# Terminal 2: Frontend
+7. Start the client:
+\`\`\`
 cd client
 npm run dev
-```
+\`\`\`
 
-- Backend: http://localhost:5000
-- Frontend: http://localhost:5173
-- Open http://localhost:5173 in browser.
+8. Open http://localhost:5173
 
-## 📁 Project Structure
-```
-fixmycampus/
-├── client/          # React + Vite frontend
-│   ├── src/
-│   │   ├── components/  # Navbar, LocationMap, PDFExport
-│   │   ├── pages/       # Login, Dashboard, Reports, Analytics
-│   │   └── context/     # AuthContext
-│   └── public/
-├── server/          # Express + MongoDB backend
-│   ├── models/     # User, Report schemas
-│   ├── routes/     # auth, reports, guidance
-│   ├── utils/      # emailService
-│   └── index.js
-├── package.json
-└── README.md
-```
+## Default Admin Account
+- Email: admin@gmail.com
+- Password: admin123
 
-## 🧪 Testing
-- Frontend: `cd client && npm run lint`
-- Backend: Manual API tests with Postman (e.g., POST /api/auth/register)
+## API Endpoints
+| Method | Endpoint | Description | Auth |
+|--------|----------|-------------|------|
+| POST | /api/auth/register | Register user | No |
+| POST | /api/auth/login | Login user | No |
+| GET | /api/reports | Get all reports | Yes |
+| POST | /api/reports | Create report | Yes |
+| GET | /api/reports/:id | Get report | Yes |
+| PUT | /api/reports/:id | Update report | Yes |
+| DELETE | /api/reports/:id | Delete report | Admin |
+| GET | /api/reports/stats/analytics | Get analytics | Yes |
+| GET | /api/guidance | Get guidance | Yes |
 
-## 🔧 Development
-- Proxy configured: Frontend APIs proxy to backend.
-- HMR enabled in Vite.
-- ESLint for code quality.
+## Security
+- JWT tokens expire after 7 days
+- Passwords hashed with BCrypt (10 rounds)
+- Rate limiting: 100 requests/15min general, 10 requests/15min for auth
+- Helmet.js HTTP security headers
+- CORS restricted to client URL
+- Server-side input validation on all report submissions
 
-## 📄 API Endpoints
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/register` | User registration |
-| POST | `/api/auth/login` | User login |
-| GET/POST | `/api/reports` | List/create reports |
-| GET | `/api/guidance` | Maintenance guidance |
-
-## 🤝 Contributing
-1. Fork the repo.
-2. Create feature branch.
-3. Submit PR.
-
-## 📄 License
-ISC
-
-## 🙏 Acknowledgments
-Built with ❤️ for better campus living.
-
+## Ethics & Privacy
+- User consent required before data submission
+- Privacy notice displayed on registration and report forms
+- GDPR-compliant data deletion request process
+- Personal data never shared with third parties
+- Secure password storage with BCrypt hashing

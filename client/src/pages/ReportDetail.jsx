@@ -226,6 +226,9 @@ export default function ReportDetail() {
         <div>
           <div className="card" style={{ marginBottom:'1rem' }}>
             <h3 style={{ fontWeight:'700', marginBottom:'1rem' }}>Update Status</h3>
+            <p style={{ fontSize:'0.8rem', color:'#666', marginBottom:'0.75rem' }}>
+              📧 Reporter will be notified by email when status changes
+            </p>
             <div style={{ display:'flex', flexDirection:'column', gap:'0.5rem' }}>
               {['New', 'In Progress', 'Resolved', 'Closed'].map(s => (
                 <button key={s} className={`btn ${report.status === s ? 'btn-primary' : 'btn-outline'}`}

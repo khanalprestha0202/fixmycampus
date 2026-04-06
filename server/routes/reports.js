@@ -116,7 +116,7 @@ router.post('/:id/comments', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
 
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', auth, adminOnly, async (req, res) => {
   try {
     await Report.findByIdAndDelete(req.params.id);
     res.json({ message: 'Report deleted' });
