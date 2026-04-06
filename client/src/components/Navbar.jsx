@@ -19,6 +19,7 @@ export default function Navbar() {
     <nav className="navbar">
       <Link to="/" className="navbar-brand">FixMyCampus</Link>
       <div className="navbar-links">
+        <Link to="/profile" style={{ color:'#aaa', fontSize:'0.85rem', textDecoration:'none' }}>👤 {user?.name}</Link>
         <Link to="/" className={isActive('/')}>Dashboard</Link>
         <Link to="/reports" className={isActive('/reports')}>Reports</Link>
         <Link to="/reports/new" className={isActive('/reports/new')}>New Report</Link>
