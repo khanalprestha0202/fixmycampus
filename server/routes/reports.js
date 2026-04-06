@@ -74,7 +74,12 @@ router.put('/:id', auth, async (req, res) => {
   try {
     const update = req.body;
     if (update.status === 'Resolved') update.resolvedAt = new Date();
+    const oldReport = await Report.findById(req.params.id);
     const report = await Report.findByIdAndUpdate(req.params.id, update, { new: true });
+    if (update.status && update.status !== oldReport.status) {
+      const { sendStatusUpdateEmail } = require('../utils/emailService');
+      sendStatusUpdateEmail(report.title, report.email, update.status, report._id);
+    }
     res.json(report);
   } catch (err) { res.status(500).json({ message: err.message }); }
 });
