@@ -1,5 +1,6 @@
-# FixMyCampus - Campus Maintenance Issue Reporting System
-## Full-Stack Web Application for [Your Name] - [Course/Project Name]
+# FixMyCampus - Campus Maintenance Reporting and Tracking Platform
+## Full-Stack Web Application By Prestha Khanal
+## CPS7005 – Web Application Development
 
 **Student Implementation Summary:** I built a complete campus maintenance reporting platform from scratch using modern full-stack technologies. The system allows students to report issues, track status, and view analytics while admins manage reports securely.
 
