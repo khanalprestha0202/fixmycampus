@@ -1,27 +1,22 @@
 {
   "name": "fixmycampus",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Campus Maintenance Reporting Platform",
+  "main": "server/index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "node index.js"
+    "start": "cd server && npm start",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "test": "cd server && npm test"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["campus", "maintenance", "mern", "react", "mongodb", "express"],
+  "author": "FixMyCampus Team",
   "license": "ISC",
   "type": "commonjs",
-  "dependencies": {
-    "bcryptjs": "^3.0.3",
-    "cors": "^2.8.6",
-    "dotenv": "^17.4.0",
-    "express": "^5.2.1",
-    "helmet": "^8.1.0",
-    "jsonwebtoken": "^9.0.3",
-    "mongoose": "^9.3.3",
-    "nodemailer": "^8.0.4"
-  },
   "devDependencies": {
-    "@ljharb/tsconfig": "^0.3.2"
+    "@ljharb/tsconfig": "^0.3.2",
+    "concurrently": "^9.2.1"
   }
 }
