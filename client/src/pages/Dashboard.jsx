@@ -4,10 +4,10 @@ import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  Tooltip, ResponsiveContainer, PieChart, Pie, Cell
+  Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend
 } from 'recharts';
 
-const COLORS = ['#e94560', '#3b82f6', '#10b981', '#f59e0b'];
+const COLORS = ['#3b82f6', '#f59e0b', '#10b981', '#6b7280'];
 
 export default function Dashboard() {
   const [reports, setReports] = useState([]);
@@ -18,14 +18,10 @@ export default function Dashboard() {
     axios.get('http://localhost:5000/api/reports', {
       headers: { Authorization: `Bearer ${token}` }
     })
-      .then(res => {
-        setReports(res.data);
-        setLoading(false);
-      })
+      .then(res => { setReports(res.data); setLoading(false); })
       .catch(() => setLoading(false));
   }, [token]);
 
-  // 📊 Stats
   const stats = {
     total: reports.length,
     new: reports.filter(r => r.status === 'New').length,
@@ -36,12 +32,11 @@ export default function Dashboard() {
     high: reports.filter(r => r.priority === 'High').length,
   };
 
-  const resolutionRate =
-    stats.total > 0 ? Math.round((stats.resolved / stats.total) * 100) : 0;
+  const resolutionRate = stats.total > 0
+    ? Math.round((stats.resolved / stats.total) * 100) : 0;
 
   const recent = reports.slice(0, 5);
 
-  // 📊 Charts
   const statusChartData = [
     { name: 'New', value: stats.new },
     { name: 'In Progress', value: stats.inProgress },
@@ -56,13 +51,19 @@ export default function Dashboard() {
     }, {})
   ).map(([name, count]) => ({ name, count }));
 
-  // 🎨 Badge styles
   const getBadgeClass = (status) => {
     if (status === 'New') return 'badge badge-new';
     if (status === 'In Progress') return 'badge badge-progress';
     if (status === 'Resolved') return 'badge badge-resolved';
     return 'badge badge-closed';
   };
+
+  const statCards = [
+    { label: 'Total Reports', value: stats.total, color: '#3b82f6', icon: '📋' },
+    { label: 'New', value: stats.new, color: '#f59e0b', icon: '🆕' },
+    { label: 'In Progress', value: stats.inProgress, color: '#8b5cf6', icon: '🔧' },
+    { label: 'Resolved', value: stats.resolved, color: '#10b981', icon: '✅' },
+  ];
 
   if (loading) return <div className="loading">Loading dashboard...</div>;
 
@@ -72,90 +73,109 @@ export default function Dashboard() {
       {/* HEADER */}
       <div style={{
         background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
-        borderRadius: '18px',
-        padding: '2rem',
+        borderRadius: '16px',
+        padding: '2rem 2.5rem',
         marginBottom: '2rem',
-        color: 'white'
+        color: 'white',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: '1rem'
       }}>
-        <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
-          Welcome back, {user?.name} 👋
-        </h1>
-        <p style={{ color: '#bbb', margin: 0 }}>
-          {new Date().toLocaleDateString('en-GB', {
-            weekday: 'long',
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-          })}
-        </p>
+        <div>
+          <h1 style={{ fontSize: '1.8rem', marginBottom: '0.4rem', fontWeight: 700 }}>
+            Welcome back, {user?.name} 👋
+          </h1>
+          <p style={{ color: '#94a3b8', margin: 0, fontSize: '0.95rem' }}>
+            {new Date().toLocaleDateString('en-GB', {
+              weekday: 'long', year: 'numeric',
+              month: 'long', day: 'numeric'
+            })}
+          </p>
+        </div>
+        <Link to="/reports/new" className="btn btn-primary" style={{ fontSize: '0.95rem' }}>
+          + New Report
+        </Link>
       </div>
 
-      {/* STATS */}
-      <div className="grid-4" style={{ gap: '1rem', marginBottom: '2rem' }}>
-        {[
-          { label: 'Total', value: stats.total },
-          { label: 'New', value: stats.new },
-          { label: 'In Progress', value: stats.inProgress },
-          { label: 'Resolved', value: stats.resolved }
-        ].map((s, i) => (
-          <div key={i} className="stat-card" style={{
-            padding: '1.5rem',
+      {/* CRITICAL ALERT */}
+      {stats.critical > 0 && (
+        <div style={{
+          background: 'linear-gradient(135deg, #7f1d1d, #991b1b)',
+          color: 'white',
+          padding: '1rem 1.5rem',
+          borderRadius: '12px',
+          marginBottom: '1.5rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          fontWeight: 500
+        }}>
+          🚨 {stats.critical} critical {stats.critical === 1 ? 'issue needs' : 'issues need'} immediate attention
+        </div>
+      )}
+
+      {/* STAT CARDS */}
+      <div className="grid-4" style={{ marginBottom: '2rem' }}>
+        {statCards.map((s, i) => (
+          <div key={i} style={{
+            background: 'white',
             borderRadius: '14px',
-            background: '#fff',
-            boxShadow: '0 6px 18px rgba(0,0,0,0.06)'
+            padding: '1.5rem',
+            boxShadow: '0 2px 15px rgba(0,0,0,0.07)',
+            borderLeft: `5px solid ${s.color}`,
+            display: 'flex',
+            alignItems: 'center',
+            gap: '1rem'
           }}>
-            <h2 style={{ margin: 0, fontSize: '1.8rem' }}>{s.value}</h2>
-            <p style={{ margin: 0, color: '#666' }}>{s.label}</p>
+            <span style={{ fontSize: '2rem' }}>{s.icon}</span>
+            <div>
+              <div style={{ fontSize: '2rem', fontWeight: 700, color: s.color, lineHeight: 1 }}>
+                {s.value}
+              </div>
+              <div style={{ color: '#64748b', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                {s.label}
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-      {/* ALERT */}
-      {stats.critical > 0 && (
-        <div style={{
-          background: '#7f1d1d',
-          color: 'white',
-          padding: '1rem',
-          borderRadius: '12px',
-          marginBottom: '1.5rem'
-        }}>
-          🚨 {stats.critical} critical issues need immediate attention
-        </div>
-      )}
-
-      {/* MAIN GRID */}
-      <div className="grid-2" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
+      {/* CHARTS + RECENT */}
+      <div className="grid-2" style={{ marginBottom: '2rem' }}>
 
         {/* RECENT REPORTS */}
-        <div className="card" style={{ padding: '1.5rem' }}>
-          <h2 style={{ marginBottom: '1rem' }}>Recent Reports</h2>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+        <div className="card">
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+            <h2 style={{ fontSize: '1.1rem', fontWeight: 700 }}>Recent Reports</h2>
+            <Link to="/reports" style={{ color: '#e94560', fontSize: '0.85rem', textDecoration: 'none', fontWeight: 600 }}>
+              View all →
+            </Link>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+            {recent.length === 0 && (
+              <p style={{ color: '#94a3b8', textAlign: 'center', padding: '1rem' }}>No reports yet</p>
+            )}
             {recent.map(r => (
-              <Link
-                key={r._id}
-                to={`/reports/${r._id}`}
-                style={{ textDecoration: 'none', color: 'inherit' }}
-              >
+              <Link key={r._id} to={`/reports/${r._id}`}
+                style={{ textDecoration: 'none', color: 'inherit' }}>
                 <div style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  padding: '0.9rem',
-                  border: '1px solid #eee',
-                  borderRadius: '10px',
-                  background: '#fafafa'
-                }}>
+                  display: 'flex', justifyContent: 'space-between',
+                  alignItems: 'center', padding: '0.85rem 1rem',
+                  border: '1px solid #f1f5f9', borderRadius: '10px',
+                  background: '#fafafa', transition: 'background 0.2s'
+                }}
+                  onMouseEnter={e => e.currentTarget.style.background = '#f1f5f9'}
+                  onMouseLeave={e => e.currentTarget.style.background = '#fafafa'}
+                >
                   <div>
-                    <div style={{ fontWeight: 600 }}>{r.title}</div>
-                    <div style={{ fontSize: '0.8rem', color: '#777' }}>
-                      {r.category}
+                    <div style={{ fontWeight: 600, fontSize: '0.95rem' }}>{r.title}</div>
+                    <div style={{ fontSize: '0.78rem', color: '#94a3b8', marginTop: '2px' }}>
+                      {r.category} • {r.location}
                     </div>
                   </div>
-
-                  <span className={getBadgeClass(r.status)}>
-                    {r.status}
-                  </span>
+                  <span className={getBadgeClass(r.status)}>{r.status}</span>
                 </div>
               </Link>
             ))}
@@ -163,19 +183,27 @@ export default function Dashboard() {
         </div>
 
         {/* PIE CHART */}
-        <div className="card" style={{ padding: '1.5rem' }}>
-          <h2 style={{ marginBottom: '1rem' }}>Status Overview</h2>
-
-          <ResponsiveContainer width="100%" height={220}>
-            <PieChart>
-              <Pie data={statusChartData} dataKey="value" outerRadius={80}>
-                {statusChartData.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
+        <div className="card">
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1rem' }}>
+            Status Overview
+          </h2>
+          {statusChartData.length === 0 ? (
+            <p style={{ color: '#94a3b8', textAlign: 'center', padding: '2rem' }}>No data yet</p>
+          ) : (
+            <ResponsiveContainer width="100%" height={240}>
+              <PieChart>
+                <Pie data={statusChartData} dataKey="value"
+                  outerRadius={85} innerRadius={40}
+                  paddingAngle={3}>
+                  {statusChartData.map((_, i) => (
+                    <Cell key={i} fill={COLORS[i]} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          )}
         </div>
       </div>
 
@@ -183,45 +211,53 @@ export default function Dashboard() {
       {user?.role === 'admin' && (
         <div style={{
           background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
-          color: 'white',
-          padding: '1.5rem',
-          borderRadius: '14px',
-          marginBottom: '2rem'
+          color: 'white', padding: '1.75rem',
+          borderRadius: '14px', marginBottom: '2rem'
         }}>
-          <h2 style={{ marginBottom: '1rem' }}>Admin Overview</h2>
-
-          <div className="grid-3" style={{ gap: '1rem' }}>
-            <div>
-              <h2>{stats.critical}</h2>
-              <p>Critical Issues</p>
-            </div>
-
-            <div>
-              <h2>{stats.high}</h2>
-              <p>High Priority</p>
-            </div>
-
-            <div>
-              <h2>{resolutionRate}%</h2>
-              <p>Resolution Rate</p>
-            </div>
+          <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.25rem' }}>
+            Admin Overview
+          </h2>
+          <div className="grid-3">
+            {[
+              { label: 'Critical Issues', value: stats.critical, color: '#ef4444' },
+              { label: 'High Priority', value: stats.high, color: '#f59e0b' },
+              { label: 'Resolution Rate', value: `${resolutionRate}%`, color: '#10b981' },
+            ].map((item, i) => (
+              <div key={i} style={{
+                background: 'rgba(255,255,255,0.08)',
+                borderRadius: '12px', padding: '1.25rem',
+                borderTop: `3px solid ${item.color}`
+              }}>
+                <div style={{ fontSize: '2rem', fontWeight: 700, color: item.color }}>
+                  {item.value}
+                </div>
+                <div style={{ color: '#94a3b8', fontSize: '0.85rem', marginTop: '0.25rem' }}>
+                  {item.label}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       )}
 
       {/* BAR CHART */}
-      <div className="card" style={{ padding: '1.5rem' }}>
-        <h2 style={{ marginBottom: '1rem' }}>Top Categories</h2>
-
-        <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={categoryData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="name" />
-            <YAxis />
-            <Tooltip />
-            <Bar dataKey="count" fill="#e94560" />
-          </BarChart>
-        </ResponsiveContainer>
+      <div className="card">
+        <h2 style={{ fontSize: '1.1rem', fontWeight: 700, marginBottom: '1.25rem' }}>
+          Reports by Category
+        </h2>
+        {categoryData.length === 0 ? (
+          <p style={{ color: '#94a3b8', textAlign: 'center', padding: '2rem' }}>No data yet</p>
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={categoryData} barSize={40}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Bar dataKey="count" fill="#e94560" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </div>
 
     </div>
