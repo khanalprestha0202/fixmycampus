@@ -12,6 +12,7 @@ import Analytics from './pages/Analytics';
 import Guidance from './pages/Guidance';
 import NotFound from './pages/NotFound';
 import Profile from './pages/Profile';
+import PrivacyConsent from './components/PrivacyConsent';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -42,6 +43,7 @@ function App() {
           </PrivateRoute>
         } />
       </Routes>
+      <PrivacyConsent />
     </BrowserRouter>
   );
 }
