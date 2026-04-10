@@ -11,6 +11,16 @@ const reportSchema = new mongoose.Schema({
   photoUrl: { type: String },
   reportedBy: { type: String, required: true },
   email: { type: String, required: true },
+  emailLogs: [
+  {
+    subject: String,
+    message: String,
+    sentAt: {
+      type: Date,
+      default: Date.now
+    }
+  }
+],
   comments: [{ text: String, addedAt: { type: Date, default: Date.now }, addedBy: String }],
   resolvedAt: { type: Date },
   consentGiven: { type: Boolean, required: true }

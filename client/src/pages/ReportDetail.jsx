@@ -171,6 +171,26 @@ export default function ReportDetail() {
           </div>
         </div>
 
+        {report.emailLogs?.length > 0 && (
+  <div className="card" style={{ marginTop: '1rem' }}>
+    <h3>Email Notifications</h3>
+
+    {report.emailLogs.map((email, i) => (
+      <div key={i} style={{
+        padding: '0.75rem',
+        background: '#f8f9fa',
+        marginBottom: '0.5rem',
+        borderRadius: '8px'
+      }}>
+        <div style={{ fontWeight: 'bold' }}>{email.subject}</div>
+        <div style={{ fontSize: '0.8rem', color: '#666' }}>
+          {email.message}
+        </div>
+      </div>
+    ))}
+  </div>
+)}
+
         {/* RIGHT SIDE */}
         <div>
           <div className="card">
