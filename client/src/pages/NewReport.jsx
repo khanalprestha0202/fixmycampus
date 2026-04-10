@@ -4,6 +4,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
+// New report form - triggers email notifications on submission and status changes
+
 export default function NewReport() {
   const { token, user } = useAuth();
   const navigate = useNavigate();
