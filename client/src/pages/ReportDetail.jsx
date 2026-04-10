@@ -4,6 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import LocationMap from '../components/LocationMap';
+import PDFExport from '../components/PDFExport';
 
 const PDFExport = ({ report }) => {
   const handlePrint = () => {
