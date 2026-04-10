@@ -54,7 +54,7 @@ export default function Dashboard() {
       acc[r.category] = (acc[r.category] || 0) + 1;
       return acc;
     }, {})
-  ).map(([name, count]) => ({ name, count })).slice(0, 5);
+  ).map(([name, count]) => ({ name, count }));
 
   // 🎨 Badge styles
   const getBadgeClass = (status) => {
@@ -64,56 +64,133 @@ export default function Dashboard() {
     return 'badge badge-closed';
   };
 
-  const getPriorityClass = (priority) => {
-    if (priority === 'Low') return 'badge badge-low';
-    if (priority === 'Medium') return 'badge badge-medium';
-    if (priority === 'High') return 'badge badge-high';
-    return 'badge badge-critical';
-  };
-
   if (loading) return <div className="loading">Loading dashboard...</div>;
 
   return (
     <div className="container">
 
-      {/* 🔥 HEADER */}
+      {/* HEADER */}
       <div style={{
-        background:'linear-gradient(135deg, #1a1a2e, #16213e)',
-        borderRadius:'16px',
-        padding:'2rem',
-        marginBottom:'2rem',
-        color:'white'
+        background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+        borderRadius: '18px',
+        padding: '2rem',
+        marginBottom: '2rem',
+        color: 'white'
       }}>
-        <h1 style={{ fontSize:'1.8rem' }}>
-          Welcome back, {user?.name}! 👋
+        <h1 style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>
+          Welcome back, {user?.name} 👋
         </h1>
-        <p style={{ color:'#aaa' }}>
+        <p style={{ color: '#bbb', margin: 0 }}>
           {new Date().toLocaleDateString('en-GB', {
-            weekday:'long', year:'numeric', month:'long', day:'numeric'
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
           })}
         </p>
       </div>
 
-      {/* 📊 STATS */}
-      <div className="grid-4" style={{ marginBottom:'2rem' }}>
-        <div className="stat-card"><h2>{stats.total}</h2><p>Total</p></div>
-        <div className="stat-card"><h2>{stats.new}</h2><p>New</p></div>
-        <div className="stat-card"><h2>{stats.inProgress}</h2><p>In Progress</p></div>
-        <div className="stat-card"><h2>{stats.resolved}</h2><p>Resolved</p></div>
+      {/* STATS */}
+      <div className="grid-4" style={{ gap: '1rem', marginBottom: '2rem' }}>
+        {[
+          { label: 'Total', value: stats.total },
+          { label: 'New', value: stats.new },
+          { label: 'In Progress', value: stats.inProgress },
+          { label: 'Resolved', value: stats.resolved }
+        ].map((s, i) => (
+          <div key={i} className="stat-card" style={{
+            padding: '1.5rem',
+            borderRadius: '14px',
+            background: '#fff',
+            boxShadow: '0 6px 18px rgba(0,0,0,0.06)'
+          }}>
+            <h2 style={{ margin: 0, fontSize: '1.8rem' }}>{s.value}</h2>
+            <p style={{ margin: 0, color: '#666' }}>{s.label}</p>
+          </div>
+        ))}
       </div>
 
-      {/* 🛡️ ADMIN PANEL */}
+      {/* ALERT */}
+      {stats.critical > 0 && (
+        <div style={{
+          background: '#7f1d1d',
+          color: 'white',
+          padding: '1rem',
+          borderRadius: '12px',
+          marginBottom: '1.5rem'
+        }}>
+          🚨 {stats.critical} critical issues need immediate attention
+        </div>
+      )}
+
+      {/* MAIN GRID */}
+      <div className="grid-2" style={{ gap: '1.5rem', marginBottom: '2rem' }}>
+
+        {/* RECENT REPORTS */}
+        <div className="card" style={{ padding: '1.5rem' }}>
+          <h2 style={{ marginBottom: '1rem' }}>Recent Reports</h2>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            {recent.map(r => (
+              <Link
+                key={r._id}
+                to={`/reports/${r._id}`}
+                style={{ textDecoration: 'none', color: 'inherit' }}
+              >
+                <div style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '0.9rem',
+                  border: '1px solid #eee',
+                  borderRadius: '10px',
+                  background: '#fafafa'
+                }}>
+                  <div>
+                    <div style={{ fontWeight: 600 }}>{r.title}</div>
+                    <div style={{ fontSize: '0.8rem', color: '#777' }}>
+                      {r.category}
+                    </div>
+                  </div>
+
+                  <span className={getBadgeClass(r.status)}>
+                    {r.status}
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* PIE CHART */}
+        <div className="card" style={{ padding: '1.5rem' }}>
+          <h2 style={{ marginBottom: '1rem' }}>Status Overview</h2>
+
+          <ResponsiveContainer width="100%" height={220}>
+            <PieChart>
+              <Pie data={statusChartData} dataKey="value" outerRadius={80}>
+                {statusChartData.map((_, i) => (
+                  <Cell key={i} fill={COLORS[i]} />
+                ))}
+              </Pie>
+              <Tooltip />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* ADMIN PANEL */}
       {user?.role === 'admin' && (
         <div style={{
-          background:'linear-gradient(135deg, #1a1a2e, #16213e)',
-          color:'white',
-          padding:'1.5rem',
-          borderRadius:'12px',
-          marginBottom:'2rem'
+          background: 'linear-gradient(135deg, #1a1a2e, #16213e)',
+          color: 'white',
+          padding: '1.5rem',
+          borderRadius: '14px',
+          marginBottom: '2rem'
         }}>
-          <h2>🛡️ Admin Overview</h2>
+          <h2 style={{ marginBottom: '1rem' }}>Admin Overview</h2>
 
-          <div className="grid-3">
+          <div className="grid-3" style={{ gap: '1rem' }}>
             <div>
               <h2>{stats.critical}</h2>
               <p>Critical Issues</p>
@@ -132,46 +209,11 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* 🚨 ALERT */}
-      {stats.critical > 0 && (
-        <div style={{ background:'#7f1d1d', color:'white', padding:'1rem', borderRadius:'10px', marginBottom:'1.5rem' }}>
-          🚨 {stats.critical} critical issues need attention!
-        </div>
-      )}
+      {/* BAR CHART */}
+      <div className="card" style={{ padding: '1.5rem' }}>
+        <h2 style={{ marginBottom: '1rem' }}>Top Categories</h2>
 
-      {/* 📋 RECENT */}
-      <div className="grid-2" style={{ marginBottom:'2rem' }}>
-        <div className="card">
-          <h2>Recent Reports</h2>
-          {recent.map(r => (
-            <Link key={r._id} to={`/reports/${r._id}`}>
-              <div>
-                {r.title} - <span className={getBadgeClass(r.status)}>{r.status}</span>
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        {/* 📊 PIE CHART */}
-        <div className="card">
-          <h2>Status Overview</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={statusChartData} dataKey="value">
-                {statusChartData.map((_, i) => (
-                  <Cell key={i} fill={COLORS[i]} />
-                ))}
-              </Pie>
-              <Tooltip />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
-      {/* 📊 BAR CHART */}
-      <div className="card">
-        <h2>Top Categories</h2>
-        <ResponsiveContainer width="100%" height={250}>
+        <ResponsiveContainer width="100%" height={260}>
           <BarChart data={categoryData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
