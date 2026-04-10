@@ -7,6 +7,8 @@ import {
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 
+// Analytics page - displays issue trends, hotspots and resolution times
+
 const COLORS = ['#e94560', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
 
 const PRIORITY_COLORS = {
