@@ -1,0 +1,1 @@
+// Notifications page - alerts users about report status changes and updates
