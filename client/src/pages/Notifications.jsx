@@ -24,7 +24,7 @@ export default function Notifications() {
           const daysOld = Math.floor((now - createdAt) / (1000 * 60 * 60 * 24));
           const daysLeft = deadline - daysOld;
 
-          // Overdue — past deadline and not resolved/closed
+          // OVERDUE
           if (daysLeft < 0 && r.status !== 'Resolved' && r.status !== 'Closed') {
             notifs.push({
               id: r._id,
@@ -32,8 +32,9 @@ export default function Notifications() {
               type: 'overdue',
               time: r.createdAt
             });
-          // Warning — deadline approaching in 2 days or less
-          } else if (daysLeft <= 2 && daysLeft >= 0 && r.status !== 'Resolved' && r.status !== 'Closed') {
+          }
+          // DEADLINE WARNING - due within 2 days
+          else if (daysLeft <= 2 && daysLeft >= 0 && r.status !== 'Resolved' && r.status !== 'Closed') {
             notifs.push({
               id: r._id,
               message: `"${r.title}" deadline in ${daysLeft} day(s)!`,
@@ -41,8 +42,7 @@ export default function Notifications() {
               time: r.createdAt
             });
           }
-
-          // Critical priority and still New — needs immediate attention
+          // CRITICAL
           if (r.priority === 'Critical' && r.status === 'New') {
             notifs.push({
               id: r._id,
@@ -51,8 +51,7 @@ export default function Notifications() {
               time: r.createdAt
             });
           }
-
-          // Status updates
+          // IN PROGRESS
           if (r.status === 'In Progress') {
             notifs.push({
               id: r._id,
@@ -61,6 +60,7 @@ export default function Notifications() {
               time: r.updatedAt
             });
           }
+          // RESOLVED
           if (r.status === 'Resolved') {
             notifs.push({
               id: r._id,
@@ -71,17 +71,16 @@ export default function Notifications() {
           }
         });
 
-        // Sort newest first, limit to 15
+        // Sort by time, newest first
         notifs.sort((a, b) => new Date(b.time) - new Date(a.time));
         setNotifications(notifs.slice(0, 15));
       } catch {}
     };
 
     fetchNotifications();
-    // Refresh every 30 seconds automatically
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, [token, deadline]);
+  }, [token, deadline]); // re-runs when deadline changes
 
   const typeStyles = {
     overdue:  { bg: '#fff1f2', color: '#991b1b', icon: '🚨' },
@@ -95,14 +94,8 @@ export default function Notifications() {
     n.type === 'overdue' || n.type === 'warning' || n.type === 'critical'
   ).length;
 
-  // Format today's date to show in the popup header
-  const todayStr = new Date().toLocaleDateString('en-GB', {
-    weekday: 'short', day: '2-digit', month: 'short', year: 'numeric'
-  });
-
   return (
     <div style={{ position: 'relative' }}>
-      {/* Bell button with unread badge */}
       <button onClick={() => setShow(!show)} style={{
         background: 'none', border: 'none', cursor: 'pointer',
         position: 'relative', padding: '0.5rem'
@@ -121,7 +114,6 @@ export default function Notifications() {
         )}
       </button>
 
-      {/* Notification dropdown */}
       {show && (
         <div style={{
           position: 'absolute', right: '0', top: '100%',
@@ -129,26 +121,19 @@ export default function Notifications() {
           boxShadow: '0 4px 20px rgba(0,0,0,0.15)', zIndex: 1000,
           maxHeight: '450px', overflowY: 'auto'
         }}>
-          {/* Header — shows current date + deadline toggle */}
           <div style={{
             padding: '1rem', borderBottom: '1px solid #f0f0f0',
             position: 'sticky', top: 0, background: 'white'
           }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.25rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
               <h3 style={{ fontWeight: '700', fontSize: '1rem', margin: 0 }}>Notifications</h3>
               <button onClick={() => setShow(false)} style={{
                 background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem'
               }}>×</button>
             </div>
-
-            {/* Current date shown clearly below the title */}
-            <div style={{ fontSize: '0.73rem', color: '#94a3b8', marginBottom: '0.5rem' }}>
-              Today: {todayStr}
-            </div>
-
-            {/* Deadline window selector */}
+            {/* Deadline toggle - changes how overdue/warning is calculated */}
             <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Deadline window:</span>
+              <span style={{ fontSize: '0.75rem', color: '#64748b' }}>Deadline:</span>
               {[7, 14, 30].map(d => (
                 <button key={d} onClick={() => setDeadline(d)} style={{
                   padding: '0.2rem 0.6rem', borderRadius: '20px', fontSize: '0.75rem',
@@ -162,7 +147,6 @@ export default function Notifications() {
             </div>
           </div>
 
-          {/* Notification list */}
           {notifications.length === 0 ? (
             <div style={{ padding: '2rem', textAlign: 'center', color: '#94a3b8' }}>
               <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🎉</div>
@@ -180,12 +164,8 @@ export default function Notifications() {
                   <div style={{ fontSize: '0.85rem', fontWeight: '500', color: style.color }}>
                     {style.icon} {n.message}
                   </div>
-                  {/* Show exact date and time for each notification */}
                   <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.25rem' }}>
-                    {new Date(n.time).toLocaleString('en-GB', {
-                      day: '2-digit', month: 'short', year: 'numeric',
-                      hour: '2-digit', minute: '2-digit'
-                    })}
+                    {new Date(n.time).toLocaleString('en-GB')}
                   </div>
                 </div>
               );
