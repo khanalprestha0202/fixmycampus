@@ -7,21 +7,16 @@ import {
 } from 'recharts';
 import { useAuth } from '../context/AuthContext';
 
-// Analytics page - displays issue trends, hotspots and resolution times
-
 const COLORS = ['#e94560', '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'];
-
 const PRIORITY_COLORS = {
-  'Critical': '#ef4444',
-  'High': '#f59e0b',
-  'Medium': '#3b82f6',
-  'Low': '#10b981'
+  'Critical': '#ef4444', 'High': '#f59e0b', 'Medium': '#3b82f6', 'Low': '#10b981'
 };
 
 export default function Analytics() {
   const [stats, setStats] = useState(null);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [trendDays, setTrendDays] = useState(7);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -55,15 +50,13 @@ export default function Analytics() {
   );
 
   const statusData = stats.byStatus.map(s => ({ name: s._id, value: s.count }));
-  const categoryData = stats.byCategory.map(s => ({ name: s._id, count: s.count }))
-    .sort((a, b) => b.count - a.count);
-  const buildingData = stats.byBuilding.map(s => ({ name: s._id, count: s.count }))
-    .sort((a, b) => b.count - a.count);
+  const categoryData = stats.byCategory.map(s => ({ name: s._id, count: s.count })).sort((a, b) => b.count - a.count);
+  const buildingData = stats.byBuilding.map(s => ({ name: s._id, count: s.count })).sort((a, b) => b.count - a.count);
   const priorityData = stats.byPriority.map(s => ({ name: s._id, value: s.count }));
 
   const trendData = () => {
-    const last7Days = [];
-    for (let i = 6; i >= 0; i--) {
+    const days = [];
+    for (let i = trendDays - 1; i >= 0; i--) {
       const date = new Date();
       date.setDate(date.getDate() - i);
       const dateStr = date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short' });
@@ -71,16 +64,15 @@ export default function Analytics() {
         const reportDate = new Date(r.createdAt);
         return reportDate.toDateString() === date.toDateString();
       }).length;
-      last7Days.push({ date: dateStr, reports: count });
+      days.push({ date: dateStr, reports: count });
     }
-    return last7Days;
+    return days;
   };
 
   const resolvedCount = stats.byStatus.find(s => s._id === 'Resolved')?.count || 0;
   const inProgressCount = stats.byStatus.find(s => s._id === 'In Progress')?.count || 0;
   const criticalCount = stats.byPriority.find(s => s._id === 'Critical')?.count || 0;
-  const resolutionRate = stats.total > 0
-    ? Math.round((resolvedCount / stats.total) * 100) : 0;
+  const resolutionRate = stats.total > 0 ? Math.round((resolvedCount / stats.total) * 100) : 0;
   const avgResolutionTime = reports.filter(r => r.resolvedAt).reduce((acc, r) => {
     const days = Math.round((new Date(r.resolvedAt) - new Date(r.createdAt)) / (1000 * 60 * 60 * 24));
     return acc + days;
@@ -96,8 +88,7 @@ export default function Analytics() {
   const Card = ({ children, style = {} }) => (
     <div style={{
       background: 'white', borderRadius: '12px', padding: '1.5rem',
-      boxShadow: '0 1px 3px rgba(0,0,0,0.07)', border: '1px solid #f1f5f9',
-      ...style
+      boxShadow: '0 1px 3px rgba(0,0,0,0.07)', border: '1px solid #f1f5f9', ...style
     }}>
       {children}
     </div>
@@ -114,17 +105,13 @@ export default function Analytics() {
     <div style={{ background: '#f8fafc', minHeight: '100vh', padding: '2rem' }}>
       <div style={{ maxWidth: '1280px', margin: '0 auto' }}>
 
-        {/* PAGE HEADER */}
         <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>
-            Analytics
-          </h1>
+          <h1 style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a', margin: 0 }}>Analytics</h1>
           <p style={{ color: '#64748b', margin: '0.25rem 0 0', fontSize: '0.9rem' }}>
             Insights and trends from campus maintenance reports — updated in real time
           </p>
         </div>
 
-        {/* INSIGHT BANNER */}
         <div style={{
           background: 'linear-gradient(135deg, #1e293b, #334155)',
           borderRadius: '12px', padding: '1.25rem 1.75rem',
@@ -149,11 +136,7 @@ export default function Analytics() {
           </div>
         </div>
 
-        {/* STAT CARDS */}
-        <div style={{
-          display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)',
-          gap: '1rem', marginBottom: '1.5rem'
-        }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
           {[
             { label: 'Total Reports', value: stats.total, sub: 'All time submissions', color: '#6366f1', bg: '#eef2ff', icon: '📋' },
             { label: 'Resolution Rate', value: `${resolutionRate}%`, sub: `${resolvedCount} of ${stats.total} resolved`, color: '#10b981', bg: '#f0fdf4', icon: '✅' },
@@ -174,22 +157,32 @@ export default function Analytics() {
                 </div>
                 <div style={{ fontSize: '0.8rem', color: '#64748b', fontWeight: 500 }}>{s.label}</div>
               </div>
-              <div style={{ fontSize: '1.75rem', fontWeight: 700, color: s.color, lineHeight: 1 }}>
-                {s.value}
-              </div>
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.3rem' }}>
-                {s.sub}
-              </div>
+              <div style={{ fontSize: '1.75rem', fontWeight: 700, color: s.color, lineHeight: 1 }}>{s.value}</div>
+              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.3rem' }}>{s.sub}</div>
             </div>
           ))}
         </div>
 
-        {/* TREND CHART */}
+        {/* TREND CHART WITH DAY TOGGLE */}
         <Card style={{ marginBottom: '1.5rem' }}>
-          <SectionTitle
-            title="Report Submissions — Last 7 Days"
-            subtitle="Daily volume of new maintenance reports submitted by campus users"
-          />
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
+            <SectionTitle
+              title={`Report Submissions — Last ${trendDays} Days`}
+              subtitle="Daily volume of new maintenance reports submitted by campus users"
+            />
+            <div style={{ display: 'flex', gap: '0.4rem' }}>
+              {[7, 14, 30].map(d => (
+                <button key={d} onClick={() => setTrendDays(d)} style={{
+                  padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.8rem',
+                  fontWeight: 600, cursor: 'pointer', border: 'none',
+                  background: trendDays === d ? '#e94560' : '#f1f5f9',
+                  color: trendDays === d ? 'white' : '#64748b'
+                }}>
+                  {d}d
+                </button>
+              ))}
+            </div>
+          </div>
           <ResponsiveContainer width="100%" height={200}>
             <AreaChart data={trendData()}>
               <defs>
@@ -207,13 +200,9 @@ export default function Analytics() {
           </ResponsiveContainer>
         </Card>
 
-        {/* CATEGORY + STATUS */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
           <Card>
-            <SectionTitle
-              title="Reports by Category"
-              subtitle={`${topCategory} is the most reported issue type on campus`}
-            />
+            <SectionTitle title="Reports by Category" subtitle={`${topCategory} is the most reported issue type on campus`} />
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={categoryData} barSize={32}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" vertical={false} />
@@ -224,20 +213,12 @@ export default function Analytics() {
               </BarChart>
             </ResponsiveContainer>
           </Card>
-
           <Card>
-            <SectionTitle
-              title="Status Distribution"
-              subtitle={`${resolutionRate}% resolution rate — ${inProgressCount} reports currently being actioned`}
-            />
+            <SectionTitle title="Status Distribution" subtitle={`${resolutionRate}% resolution rate — ${inProgressCount} reports currently being actioned`} />
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
-                <Pie data={statusData} cx="50%" cy="50%"
-                  innerRadius={55} outerRadius={90}
-                  paddingAngle={3} dataKey="value">
-                  {statusData.map((_, i) => (
-                    <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                  ))}
+                <Pie data={statusData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={3} dataKey="value">
+                  {statusData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #f1f5f9' }} />
                 <Legend iconType="circle" iconSize={8} />
@@ -246,13 +227,9 @@ export default function Analytics() {
           </Card>
         </div>
 
-        {/* BUILDINGS + PRIORITY */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
           <Card>
-            <SectionTitle
-              title="Hotspot Buildings"
-              subtitle={`${topBuilding} has the highest number of reported issues`}
-            />
+            <SectionTitle title="Hotspot Buildings" subtitle={`${topBuilding} has the highest number of reported issues`} />
             <ResponsiveContainer width="100%" height={240}>
               <BarChart data={buildingData} layout="vertical" barSize={20}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" horizontal={false} />
@@ -263,20 +240,12 @@ export default function Analytics() {
               </BarChart>
             </ResponsiveContainer>
           </Card>
-
           <Card>
-            <SectionTitle
-              title="Priority Breakdown"
-              subtitle={`${criticalCount} critical ${criticalCount === 1 ? 'issue requires' : 'issues require'} immediate attention`}
-            />
+            <SectionTitle title="Priority Breakdown" subtitle={`${criticalCount} critical ${criticalCount === 1 ? 'issue requires' : 'issues require'} immediate attention`} />
             <ResponsiveContainer width="100%" height={240}>
               <PieChart>
-                <Pie data={priorityData} cx="50%" cy="50%"
-                  innerRadius={55} outerRadius={90}
-                  paddingAngle={3} dataKey="value">
-                  {priorityData.map((entry, i) => (
-                    <Cell key={i} fill={PRIORITY_COLORS[entry.name] || COLORS[i]} />
-                  ))}
+                <Pie data={priorityData} cx="50%" cy="50%" innerRadius={55} outerRadius={90} paddingAngle={3} dataKey="value">
+                  {priorityData.map((entry, i) => <Cell key={i} fill={PRIORITY_COLORS[entry.name] || COLORS[i]} />)}
                 </Pie>
                 <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid #f1f5f9' }} />
                 <Legend iconType="circle" iconSize={8} />
@@ -285,12 +254,8 @@ export default function Analytics() {
           </Card>
         </div>
 
-        {/* PERFORMANCE SUMMARY */}
         <Card>
-          <SectionTitle
-            title="Performance Summary"
-            subtitle="Overall health of the campus maintenance reporting system"
-          />
+          <SectionTitle title="Performance Summary" subtitle="Overall health of the campus maintenance reporting system" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
             {[
               { label: 'Reports Resolved', value: resolvedCount, color: '#10b981', desc: 'Successfully closed' },
@@ -302,15 +267,9 @@ export default function Analytics() {
                 background: '#f8fafc', borderRadius: '10px',
                 padding: '1.25rem', borderLeft: `4px solid ${item.color}`
               }}>
-                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: item.color, lineHeight: 1 }}>
-                  {item.value}
-                </div>
-                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#0f172a', margin: '0.3rem 0 0.15rem' }}>
-                  {item.label}
-                </div>
-                <div style={{ fontSize: '0.775rem', color: '#64748b' }}>
-                  {item.desc}
-                </div>
+                <div style={{ fontSize: '1.75rem', fontWeight: 700, color: item.color, lineHeight: 1 }}>{item.value}</div>
+                <div style={{ fontWeight: 600, fontSize: '0.875rem', color: '#0f172a', margin: '0.3rem 0 0.15rem' }}>{item.label}</div>
+                <div style={{ fontSize: '0.775rem', color: '#64748b' }}>{item.desc}</div>
               </div>
             ))}
           </div>
