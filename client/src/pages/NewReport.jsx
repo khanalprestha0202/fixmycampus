@@ -25,7 +25,7 @@ export default function NewReport() {
     if (!consent) return toast.error('Please give consent to submit a report');
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/reports', { ...form, consentGiven: true }, {
+      await axios.post('/api/reports', { ...form, consentGiven: true }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       toast.success('Report submitted successfully!');
