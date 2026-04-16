@@ -13,22 +13,26 @@ export default function LocationMap({ building }) {
   };
 
   const coords = buildings[building] || [51.4507, -0.3360];
-  const zoom = 18;
+  const zoom = 16; // zoom out from 18 to 16 so less zoomed in by default
+
+  // Wider bbox = more of the campus visible = less zoomable feel
   const bbox = [
-    coords[1] - 0.002,
-    coords[0] - 0.001,
-    coords[1] + 0.002,
-    coords[0] + 0.001
+    coords[1] - 0.008,  // was 0.002 — now 4x wider horizontally
+    coords[0] - 0.005,  // was 0.001 — now 5x wider vertically
+    coords[1] + 0.008,
+    coords[0] + 0.005
   ];
 
   return (
     <div>
       <iframe
         width="100%"
-        height="250"
+        height="280"
         style={{ borderRadius: '8px', border: 'none' }}
         src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox[0]}%2C${bbox[1]}%2C${bbox[2]}%2C${bbox[3]}&layer=mapnik&marker=${coords[0]}%2C${coords[1]}`}
         title="Building Location Map"
+        // scrolling="no" prevents scroll-to-zoom inside the iframe
+        scrolling="no"
       />
       <div style={{
         background: '#eff6ff', borderRadius: '6px',

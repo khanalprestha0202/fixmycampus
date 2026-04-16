@@ -5,11 +5,14 @@ import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 
 // Reports page - supports filtering by status, category and location
+// Delete button is only shown to admin users (role check)
 export default function Reports() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ status:'', category:'', priority:'', search:'' });
-  const { token } = useAuth();
+
+  // user is needed to check role for admin-only delete button
+  const { token, user } = useAuth();
   const navigate = useNavigate();
 
   const fetchReports = async () => {
@@ -18,7 +21,9 @@ export default function Reports() {
       if (filters.status) params.append('status', filters.status);
       if (filters.category) params.append('category', filters.category);
       if (filters.priority) params.append('priority', filters.priority);
-      const res = await axios.get(`http://localhost:5000/api/reports?${params}`, {
+
+      // Using /api/ instead of hardcoded localhost so it works on other devices too
+      const res = await axios.get(`/api/reports?${params}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       let data = res.data;
@@ -37,14 +42,17 @@ export default function Reports() {
   useEffect(() => { fetchReports(); }, [filters]);
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this report?')) return;
+    if (!window.confirm('Are you sure you want to delete this report? This cannot be undone.')) return;
     try {
-      await axios.delete(`http://localhost:5000/api/reports/${id}`, {
+      await axios.delete(`/api/reports/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      toast.success('Report deleted');
+      toast.success('Report deleted successfully');
       fetchReports();
-    } catch { toast.error('Failed to delete'); }
+    } catch (err) {
+      // Show specific error if server returns one (e.g. not admin)
+      toast.error(err.response?.data?.message || 'Failed to delete report');
+    }
   };
 
   const exportCSV = () => {
@@ -81,6 +89,7 @@ export default function Reports() {
         </div>
       </div>
 
+      {/* FILTER BAR */}
       <div className="filter-bar">
         <input
           type="text"
@@ -123,7 +132,11 @@ export default function Reports() {
               <tbody>
                 {reports.map(r => (
                   <tr key={r._id}>
-                    <td><Link to={`/reports/${r._id}`} style={{ color:'#e94560', textDecoration:'none', fontWeight:'600' }}>{r.title}</Link></td>
+                    <td>
+                      <Link to={`/reports/${r._id}`} style={{ color:'#e94560', textDecoration:'none', fontWeight:'600' }}>
+                        {r.title}
+                      </Link>
+                    </td>
                     <td>{r.category}</td>
                     <td>{r.building}</td>
                     <td><span className={getBadge(r.status)}>{r.status}</span></td>
@@ -131,8 +144,25 @@ export default function Reports() {
                     <td style={{ fontSize:'0.85rem', color:'#666' }}>{new Date(r.createdAt).toLocaleDateString()}</td>
                     <td>
                       <div style={{ display:'flex', gap:'0.5rem' }}>
-                        <button className="btn btn-warning" style={{ padding:'0.3rem 0.75rem', fontSize:'0.8rem' }} onClick={() => navigate(`/reports/${r._id}`)}>View</button>
-                        <button className="btn btn-danger" style={{ padding:'0.3rem 0.75rem', fontSize:'0.8rem' }} onClick={() => handleDelete(r._id)}>Delete</button>
+                        {/* View button — visible to everyone */}
+                        <button
+                          className="btn btn-warning"
+                          style={{ padding:'0.3rem 0.75rem', fontSize:'0.8rem' }}
+                          onClick={() => navigate(`/reports/${r._id}`)}
+                        >
+                          View
+                        </button>
+
+                        {/* Delete button — ONLY visible to admin users */}
+                        {user?.role === 'admin' && (
+                          <button
+                            className="btn btn-danger"
+                            style={{ padding:'0.3rem 0.75rem', fontSize:'0.8rem' }}
+                            onClick={() => handleDelete(r._id)}
+                          >
+                            Delete
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>

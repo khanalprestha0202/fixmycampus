@@ -21,10 +21,11 @@ export default function Analytics() {
 
   useEffect(() => {
     Promise.all([
-      axios.get('http://localhost:5000/api/reports/stats/analytics', {
+      // Using /api/ instead of hardcoded localhost so it works on other devices too
+      axios.get('/api/reports/stats/analytics', {
         headers: { Authorization: `Bearer ${token}` }
       }),
-      axios.get('http://localhost:5000/api/reports', {
+      axios.get('/api/reports', {
         headers: { Authorization: `Bearer ${token}` }
       })
     ]).then(([statsRes, reportsRes]) => {
@@ -85,6 +86,9 @@ export default function Analytics() {
   const yesterdayCount = trend[trend.length - 2]?.reports || 0;
   const trendDirection = todayCount >= yesterdayCount ? 'up' : 'down';
 
+  // Label map so buttons show friendly names instead of just numbers
+  const trendLabels = { 4: '4 Days', 14: '2 Weeks', 30: '1 Month' };
+
   const Card = ({ children, style = {} }) => (
     <div style={{
       background: 'white', borderRadius: '12px', padding: '1.5rem',
@@ -112,6 +116,7 @@ export default function Analytics() {
           </p>
         </div>
 
+        {/* KEY INSIGHT BANNER */}
         <div style={{
           background: 'linear-gradient(135deg, #1e293b, #334155)',
           borderRadius: '12px', padding: '1.25rem 1.75rem',
@@ -136,11 +141,12 @@ export default function Analytics() {
           </div>
         </div>
 
+        {/* SUMMARY STAT CARDS */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.5rem' }}>
           {[
             { label: 'Total Reports', value: stats.total, sub: 'All time submissions', color: '#6366f1', bg: '#eef2ff', icon: '📋' },
             { label: 'Resolution Rate', value: `${resolutionRate}%`, sub: `${resolvedCount} of ${stats.total} resolved`, color: '#10b981', bg: '#f0fdf4', icon: '✅' },
-            { label: 'Avg Days to Resolve', value: avgResolutionTime.toFixed(1), sub: 'Based on closed reports', color: '#f59e0b', bg: '#fffbeb', icon: '⏱' },
+            { label: 'Avg Days to Resolve', value: avgResolutionTime.toFixed(1), sub: 'Based on closed reports', color: '#f59e0b', bg: '#fffbeb', icon: 'ⱱ' },
             { label: 'Critical Issues', value: criticalCount, sub: 'Require immediate action', color: '#ef4444', bg: '#fff1f2', icon: '🚨' },
           ].map((s, i) => (
             <div key={i} style={{
@@ -163,22 +169,23 @@ export default function Analytics() {
           ))}
         </div>
 
-        {/* TREND CHART WITH DAY TOGGLE */}
+        {/* TREND CHART — 4 Days / 2 Weeks / 1 Month toggle */}
         <Card style={{ marginBottom: '1.5rem' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <SectionTitle
-              title={`Report Submissions — Last ${trendDays} Days`}
+              title={`Report Submissions — ${trendLabels[trendDays]}`}
               subtitle="Daily volume of new maintenance reports submitted by campus users"
             />
+            {/* Date range buttons — 4 Days, 2 Weeks, 1 Month */}
             <div style={{ display: 'flex', gap: '0.4rem' }}>
-              {[7, 14, 30].map(d => (
+              {[4, 14, 30].map(d => (
                 <button key={d} onClick={() => setTrendDays(d)} style={{
                   padding: '0.3rem 0.75rem', borderRadius: '20px', fontSize: '0.8rem',
                   fontWeight: 600, cursor: 'pointer', border: 'none',
                   background: trendDays === d ? '#e94560' : '#f1f5f9',
                   color: trendDays === d ? 'white' : '#64748b'
                 }}>
-                  {d}d
+                  {trendLabels[d]}
                 </button>
               ))}
             </div>
@@ -200,6 +207,7 @@ export default function Analytics() {
           </ResponsiveContainer>
         </Card>
 
+        {/* CATEGORY + STATUS CHARTS */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
           <Card>
             <SectionTitle title="Reports by Category" subtitle={`${topCategory} is the most reported issue type on campus`} />
@@ -227,6 +235,7 @@ export default function Analytics() {
           </Card>
         </div>
 
+        {/* BUILDINGS + PRIORITY CHARTS */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
           <Card>
             <SectionTitle title="Hotspot Buildings" subtitle={`${topBuilding} has the highest number of reported issues`} />
@@ -254,6 +263,7 @@ export default function Analytics() {
           </Card>
         </div>
 
+        {/* PERFORMANCE SUMMARY */}
         <Card>
           <SectionTitle title="Performance Summary" subtitle="Overall health of the campus maintenance reporting system" />
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
