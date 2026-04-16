@@ -17,7 +17,7 @@ export default function ReportDetail() {
   const [editForm, setEditForm] = useState({});
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/api/reports/${id}`, {
+    axios.get(`/api/reports/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => {
@@ -33,7 +33,7 @@ export default function ReportDetail() {
 
   const handleStatusChange = async (status) => {
     try {
-      const res = await axios.put(`http://localhost:5000/api/reports/${id}`, { status }, {
+      const res = await axios.put(`/api/reports/${id}`, { status }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setReport(res.data);
@@ -48,7 +48,7 @@ export default function ReportDetail() {
     if (!comment.trim()) return;
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/reports/${id}/comments`,
+        `/api/reports/${id}/comments`,
         { text: comment, addedBy: user?.name },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -64,7 +64,7 @@ export default function ReportDetail() {
     e.preventDefault();
     try {
       const res = await axios.put(
-        `http://localhost:5000/api/reports/${id}`,
+        `/api/reports/${id}`,
         editForm,
         { headers: { Authorization: `Bearer ${token}` } }
       );
