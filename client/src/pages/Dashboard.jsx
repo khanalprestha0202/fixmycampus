@@ -27,7 +27,7 @@ export default function Dashboard() {
   const { token, user } = useAuth();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/reports', {
+    axios.get('/api/reports', {
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => { setReports(res.data); setLoading(false); })

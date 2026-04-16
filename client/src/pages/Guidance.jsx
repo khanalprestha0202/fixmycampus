@@ -8,7 +8,7 @@ export default function Guidance() {
   const { token } = useAuth();
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/guidance', {
+    axios.get('/api/guidance', {
       headers: { Authorization: `Bearer ${token}` }
     }).then(res => { setGuidance(res.data); setLoading(false); })
       .catch(() => setLoading(false));
