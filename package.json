@@ -11,12 +11,22 @@
     "install:all": "npm install && cd server && npm install && cd ../client && npm install",
     "test": "cd server && npm test"
   },
-  "keywords": ["campus", "maintenance", "mern", "react", "mongodb", "express"],
+  "keywords": [
+    "campus",
+    "maintenance",
+    "mern",
+    "react",
+    "mongodb",
+    "express"
+  ],
   "author": "FixMyCampus Team",
   "license": "ISC",
   "type": "commonjs",
   "devDependencies": {
     "@ljharb/tsconfig": "^0.3.2",
     "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "mongoose": "^9.4.1"
   }
 }

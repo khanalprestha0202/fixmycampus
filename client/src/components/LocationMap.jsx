@@ -1,32 +1,50 @@
 export default function LocationMap({ building }) {
   const buildings = {
-    'Main Building': [51.505, -0.09],
-    'Library': [51.506, -0.091],
-    'Sports Centre': [51.504, -0.088],
-    'Student Union': [51.507, -0.092],
-    'Science Block': [51.503, -0.089],
-    'Engineering Block': [51.508, -0.087],
-    'Arts Centre': [51.502, -0.093],
-    'Admin Building': [51.506, -0.086],
-    'Halls of Residence': [51.509, -0.094],
-    'Car Park': [51.501, -0.085],
+    'Main Building':        [51.4507, -0.3360],
+    'Library':              [51.4510, -0.3355],
+    'Sports Centre':        [51.4515, -0.3370],
+    'Student Union':        [51.4505, -0.3358],
+    'Science Block':        [51.4508, -0.3365],
+    'Engineering Block':    [51.4503, -0.3362],
+    'Arts Centre':          [51.4512, -0.3368],
+    'Admin Building':       [51.4506, -0.3356],
+    'Halls of Residence':   [51.4500, -0.3372],
+    'Car Park':             [51.4498, -0.3350],
   };
 
-  const coords = buildings[building] || [51.505, -0.09];
+  const coords = buildings[building] || [51.4507, -0.3360];
+  const zoom = 18;
+  const bbox = [
+    coords[1] - 0.002,
+    coords[0] - 0.001,
+    coords[1] + 0.002,
+    coords[0] + 0.001
+  ];
 
   return (
-    <div style={{ marginTop:'1rem' }}>
-      <h3 style={{ fontWeight:'700', marginBottom:'0.75rem', color:'#1e40af' }}>Building Location</h3>
+    <div>
       <iframe
         width="100%"
-        height="200"
-        style={{ borderRadius:'8px', border:'none' }}
-        src={`https://www.openstreetmap.org/export/embed.html?bbox=${coords[1]-0.01}%2C${coords[0]-0.01}%2C${coords[1]+0.01}%2C${coords[0]+0.01}&layer=mapnik&marker=${coords[0]}%2C${coords[1]}`}
+        height="250"
+        style={{ borderRadius: '8px', border: 'none' }}
+        src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox[0]}%2C${bbox[1]}%2C${bbox[2]}%2C${bbox[3]}&layer=mapnik&marker=${coords[0]}%2C${coords[1]}`}
         title="Building Location Map"
       />
-      <p style={{ fontSize:'0.8rem', color:'#666', marginTop:'0.3rem' }}>
-        Map data from <a href="https://openstreetmap.org" target="_blank" rel="noreferrer" style={{ color:'#e94560' }}>OpenStreetMap</a>
-      </p>
+      <div style={{
+        background: '#eff6ff', borderRadius: '6px',
+        padding: '0.5rem 0.75rem', marginTop: '0.5rem',
+        fontSize: '0.8rem', color: '#1e40af',
+        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+      }}>
+        <span>📍 St Mary's University, Twickenham — {building}</span>
+        <a
+          href={`https://www.openstreetmap.org/?mlat=${coords[0]}&mlon=${coords[1]}#map=${zoom}/${coords[0]}/${coords[1]}`}
+          target="_blank" rel="noreferrer"
+          style={{ color: '#e94560', fontWeight: 600, fontSize: '0.78rem' }}
+        >
+          Open full map ↗
+        </a>
+      </div>
     </div>
   );
 }
