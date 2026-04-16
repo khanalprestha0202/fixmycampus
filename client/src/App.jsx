@@ -13,6 +13,7 @@ import Guidance from './pages/Guidance';
 import NotFound from './pages/NotFound';
 import Profile from './pages/Profile';
 import PrivacyConsent from './components/PrivacyConsent';
+import Footer from './components/Footer';
 
 const PrivateRoute = ({ children }) => {
   const { user, loading } = useAuth();
@@ -29,17 +30,22 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/*" element={
           <PrivateRoute>
-            <Navbar />
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/reports/new" element={<NewReport />} />
-              <Route path="/reports/:id" element={<ReportDetail />} />
-              <Route path="/analytics" element={<Analytics />} />
-              <Route path="/guidance" element={<Guidance />} />
-              <Route path="*" element={<NotFound />} />
-              <Route path="/profile" element={<Profile />} />
-            </Routes>
+            <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+              <Navbar />
+              <div style={{ flex: 1 }}>
+                <Routes>
+                  <Route path="/" element={<Dashboard />} />
+                  <Route path="/reports" element={<Reports />} />
+                  <Route path="/reports/new" element={<NewReport />} />
+                  <Route path="/reports/:id" element={<ReportDetail />} />
+                  <Route path="/analytics" element={<Analytics />} />
+                  <Route path="/guidance" element={<Guidance />} />
+                  <Route path="*" element={<NotFound />} />
+                  <Route path="/profile" element={<Profile />} />
+                </Routes>
+              </div>
+              <Footer />
+            </div>
           </PrivateRoute>
         } />
       </Routes>
