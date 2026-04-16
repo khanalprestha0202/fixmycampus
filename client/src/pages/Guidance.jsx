@@ -37,27 +37,6 @@ export default function Guidance() {
           </div>
         ))}
       </div>
-
-      <div className="card" style={{ background:'linear-gradient(135deg, #1a1a2e, #16213e)', color:'white' }}>
-        <h2 style={{ fontWeight:'700', marginBottom:'1rem', fontSize:'1.3rem' }}>Emergency Contacts</h2>
-        <div className="grid-3">
-          <div style={{ background:'rgba(255,255,255,0.1)', padding:'1rem', borderRadius:'8px' }}>
-            <div style={{ fontWeight:'700', marginBottom:'0.25rem' }}>Campus Security</div>
-            <div style={{ color:'#e94560', fontSize:'1.2rem', fontWeight:'700' }}>0800 000 000</div>
-            <div style={{ fontSize:'0.85rem', color:'#aaa' }}>24/7 Emergency Line</div>
-          </div>
-          <div style={{ background:'rgba(255,255,255,0.1)', padding:'1rem', borderRadius:'8px' }}>
-            <div style={{ fontWeight:'700', marginBottom:'0.25rem' }}>Facilities Team</div>
-            <div style={{ color:'#e94560', fontSize:'1.2rem', fontWeight:'700' }}>0800 111 222</div>
-            <div style={{ fontSize:'0.85rem', color:'#aaa' }}>Mon-Fri 8am-6pm</div>
-          </div>
-          <div style={{ background:'rgba(255,255,255,0.1)', padding:'1rem', borderRadius:'8px' }}>
-            <div style={{ fontWeight:'700', marginBottom:'0.25rem' }}>Emergency Services</div>
-            <div style={{ color:'#e94560', fontSize:'1.2rem', fontWeight:'700' }}>999</div>
-            <div style={{ fontSize:'0.85rem', color:'#aaa' }}>Life threatening only</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }
