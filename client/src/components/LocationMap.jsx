@@ -1,50 +1,101 @@
 export default function LocationMap({ building }) {
   const buildings = {
-    'Main Building':        [51.4507, -0.3360],
-    'Library':              [51.4510, -0.3355],
-    'Sports Centre':        [51.4515, -0.3370],
-    'Student Union':        [51.4505, -0.3358],
-    'Science Block':        [51.4508, -0.3365],
-    'Engineering Block':    [51.4503, -0.3362],
-    'Arts Centre':          [51.4512, -0.3368],
-    'Admin Building':       [51.4506, -0.3356],
-    'Halls of Residence':   [51.4500, -0.3372],
-    'Car Park':             [51.4498, -0.3350],
+    'Main Building':        { coords: [51.4507, -0.3360], description: 'Central administration and main lecture halls' },
+    'Library':              { coords: [51.4510, -0.3355], description: 'Main campus library and study spaces' },
+    'Sports Centre':        { coords: [51.4515, -0.3370], description: 'Gym, sports hall and fitness facilities' },
+    'Student Union':        { coords: [51.4505, -0.3358], description: 'Student services, cafe and social spaces' },
+    'Science Block':        { coords: [51.4508, -0.3365], description: 'Science laboratories and research facilities' },
+    'Engineering Block':    { coords: [51.4503, -0.3362], description: 'Engineering labs and workshops' },
+    'Arts Centre':          { coords: [51.4512, -0.3368], description: 'Arts studios, theatre and creative spaces' },
+    'Admin Building':       { coords: [51.4506, -0.3356], description: 'University administration and finance' },
+    'Halls of Residence':   { coords: [51.4500, -0.3372], description: 'Student accommodation and common rooms' },
+    'Car Park':             { coords: [51.4498, -0.3350], description: 'Main campus car parking area' },
   };
 
-  const coords = buildings[building] || [51.4507, -0.3360];
-  const zoom = 16; // zoom out from 18 to 16 so less zoomed in by default
+  const place = buildings[building] || { coords: [51.4507, -0.3360], description: 'Campus location' };
+  const coords = place.coords;
+  const zoom = 17;
 
-  // Wider bbox = more of the campus visible = less zoomable feel
   const bbox = [
-    coords[1] - 0.008,  // was 0.002 — now 4x wider horizontally
-    coords[0] - 0.005,  // was 0.001 — now 5x wider vertically
+    coords[1] - 0.008,
+    coords[0] - 0.005,
     coords[1] + 0.008,
     coords[0] + 0.005
   ];
 
   return (
     <div>
-      <iframe
-        width="100%"
-        height="280"
-        style={{ borderRadius: '8px', border: 'none' }}
-        src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox[0]}%2C${bbox[1]}%2C${bbox[2]}%2C${bbox[3]}&layer=mapnik&marker=${coords[0]}%2C${coords[1]}`}
-        title="Building Location Map"
-        // scrolling="no" prevents scroll-to-zoom inside the iframe
-        scrolling="no"
-      />
+      {/* BUILDING INFO BAR */}
+      {building && (
+        <div style={{
+          background: 'linear-gradient(135deg, #1e293b, #334155)',
+          borderRadius: '8px 8px 0 0',
+          padding: '0.75rem 1rem',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem'
+        }}>
+          <div style={{
+            width: '36px', height: '36px', borderRadius: '8px',
+            background: 'rgba(233,69,96,0.2)', border: '1px solid rgba(233,69,96,0.4)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '1.1rem', flexShrink: 0
+          }}>
+            📍
+          </div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '0.9rem', color: '#f1f5f9' }}>
+              {building}
+            </div>
+            <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.1rem' }}>
+              {place.description}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MAP */}
+      <div style={{ position: 'relative' }}>
+        <iframe
+          width="100%"
+          height="260"
+          style={{
+            border: 'none',
+            borderRadius: building ? '0' : '8px',
+            display: 'block'
+          }}
+          src={`https://www.openstreetmap.org/export/embed.html?bbox=${bbox[0]}%2C${bbox[1]}%2C${bbox[2]}%2C${bbox[3]}&layer=mapnik&marker=${coords[0]}%2C${coords[1]}`}
+          title="Building Location Map"
+          scrolling="no"
+        />
+      </div>
+
+      {/* FOOTER */}
       <div style={{
-        background: '#eff6ff', borderRadius: '6px',
-        padding: '0.5rem 0.75rem', marginTop: '0.5rem',
-        fontSize: '0.8rem', color: '#1e40af',
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center'
+        background: '#f8fafc',
+        borderRadius: '0 0 8px 8px',
+        padding: '0.6rem 1rem',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderTop: '1px solid #e2e8f0'
       }}>
-        <span>📍 St Mary's University, Twickenham — {building}</span>
-        <a
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+          <span style={{ fontSize: '0.75rem', color: '#64748b' }}>
+            St Mary's University, Twickenham
+          </span>
+        </div>
+        
           href={`https://www.openstreetmap.org/?mlat=${coords[0]}&mlon=${coords[1]}#map=${zoom}/${coords[0]}/${coords[1]}`}
-          target="_blank" rel="noreferrer"
-          style={{ color: '#e94560', fontWeight: 600, fontSize: '0.78rem' }}
+          target="_blank"
+          rel="noreferrer"
+          style={{
+            display: 'flex', alignItems: 'center', gap: '0.3rem',
+            color: '#e94560', fontWeight: 600, fontSize: '0.75rem',
+            textDecoration: 'none', background: 'rgba(233,69,96,0.08)',
+            padding: '0.25rem 0.6rem', borderRadius: '20px',
+            border: '1px solid rgba(233,69,96,0.2)'
+          }}
         >
           Open full map ↗
         </a>
