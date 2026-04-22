@@ -32,16 +32,16 @@ export default function ReportDetail() {
   }, [id]);
 
   const handleStatusChange = async (status) => {
-    try {
-      const res = await axios.put(`/api/reports/${id}`, { status }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setReport(res.data);
-      toast.success('Status updated to ' + status);
-    } catch {
-      toast.error('Failed to update status');
-    }
-  };
+  try {
+    const res = await axios.put(`/api/reports/${id}/status`, { status }, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    setReport(res.data);
+    toast.success('Status updated to ' + status);
+  } catch {
+    toast.error('Failed to update status');
+  }
+};
 
   const handleAddComment = async (e) => {
     e.preventDefault();
