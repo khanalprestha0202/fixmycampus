@@ -16,7 +16,7 @@ export default function Analytics() {
   const [stats, setStats] = useState(null);
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [trendDays, setTrendDays] = useState(7);
+  const [trendDays, setTrendDays] = useState(14);
   const { token } = useAuth();
 
   useEffect(() => {
@@ -142,7 +142,7 @@ export default function Analytics() {
           {[
             { label: 'Total Reports', value: stats.total, sub: 'All time submissions', color: '#6366f1', bg: '#eef2ff', icon: '📋' },
             { label: 'Resolution Rate', value: `${resolutionRate}%`, sub: `${resolvedCount} of ${stats.total} resolved`, color: '#10b981', bg: '#f0fdf4', icon: '✅' },
-            { label: 'Avg Days to Resolve', value: avgResolutionTime.toFixed(1), sub: 'Based on closed reports', color: '#f59e0b', bg: '#fffbeb', icon: 'ⱱ' },
+            { label: 'Avg Days to Resolve', value: avgResolutionTime.toFixed(1), sub: 'Based on closed reports', color: '#f59e0b', bg: '#fffbeb', icon: '⏱' },
             { label: 'Critical Issues', value: criticalCount, sub: 'Require immediate action', color: '#ef4444', bg: '#fff1f2', icon: '🚨' },
           ].map((s, i) => (
             <div key={i} style={{
@@ -171,7 +171,6 @@ export default function Analytics() {
               title={`Report Submissions — ${trendLabels[trendDays]}`}
               subtitle="Daily volume of new maintenance reports submitted by campus users"
             />
-
             <div style={{ display: 'flex', gap: '0.4rem' }}>
               {[4, 14, 30].map(d => (
                 <button key={d} onClick={() => setTrendDays(d)} style={{
