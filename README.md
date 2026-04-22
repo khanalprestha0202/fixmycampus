@@ -13,8 +13,28 @@ FixMyCampus is a campus maintenance reporting system for St Mary's University. S
 
 ## Technologies Used
 
-- React 19 + Vite, Node.js + Express, MongoDB + Mongoose
-- JWT + BCrypt, Nodemailer, Recharts, OpenStreetMap
+**Frontend**
+- React 19 + Vite — UI framework and build tool
+- React Router v7 — client-side routing
+- Axios — HTTP requests to the backend
+- Recharts — analytics charts and data visualisation
+- Custom CSS — responsive styling without frameworks
+
+**Backend**
+- Node.js + Express.js — server and REST API
+- MongoDB + Mongoose — database and schema modelling
+- JWT + BCrypt — authentication and password hashing
+- Nodemailer — email notifications on status changes
+- Helmet.js — HTTP security headers
+- Express Rate Limiter — API request limiting
+
+**External API**
+- OpenStreetMap — interactive building location maps
+
+**Dev Tools**
+- Git + GitHub — version control with feature branches
+- Jest + Supertest — backend testing
+- Vite — frontend development server and bundler
 
 ---
 
