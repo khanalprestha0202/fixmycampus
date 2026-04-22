@@ -1,6 +1,5 @@
 const Report = require('../models/Report');
 const { sendStatusUpdateEmail } = require('../utils/emailService');
-const { transporter } = require('../utils/mailer');
 
 const getAnalytics = async (req, res) => {
   try {
@@ -78,30 +77,35 @@ const updateReport = async (req, res) => {
 const updateStatus = async (req, res) => {
   try {
     const { status } = req.body;
+
     const report = await Report.findById(req.params.id);
     if (!report) return res.status(404).json({ message: 'Report not found' });
 
+    if (report.status === status) {
+      return res.json(report);
+    }
+
+    const oldStatus = report.status;
     report.status = status;
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
-      to: report.email || 'test@gmail.com',
-      subject: `Report Status Updated: ${report.title}`,
-      html: `
-        <h2>FixMyCampus Update</h2>
-        <p><b>Report:</b> ${report.title}</p>
-        <p><b>New Status:</b> ${report.status}</p>
-      `
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    report.emailLogs.push({
-      subject: mailOptions.subject,
-      message: `Status changed to ${report.status}`
-    });
+    if (status === 'Resolved') {
+      report.resolvedAt = new Date();
+    }
 
     await report.save();
+
+    try {
+      await sendStatusUpdateEmail(report.title, report.email, status, report._id);
+
+      report.emailLogs.push({
+        subject: `Status changed to ${status}`,
+        message: `Status updated from ${oldStatus} to ${status}`
+      });
+      await report.save();
+    } catch (emailErr) {
+      console.log('Email failed (non-critical):', emailErr.message);
+    }
+
     res.json(report);
   } catch (err) {
     res.status(500).json({ message: err.message });
