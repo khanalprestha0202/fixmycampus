@@ -1,0 +1,32 @@
+{
+  "name": "fixmycampus",
+  "version": "1.0.0",
+  "description": "Campus Maintenance Reporting Platform",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "cd server && npm start",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "install:all": "npm install && cd server && npm install && cd ../client && npm install",
+    "test": "cd server && npm test"
+  },
+  "keywords": [
+    "campus",
+    "maintenance",
+    "mern",
+    "react",
+    "mongodb",
+    "express"
+  ],
+  "author": "FixMyCampus Team",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@ljharb/tsconfig": "^0.3.2",
+    "concurrently": "^9.2.1"
+  },
+  "dependencies": {
+    "mongoose": "^9.4.1"
+  }
+}
