@@ -21,7 +21,7 @@ const sendStatusUpdateEmail = async (reportTitle, reporterEmail, newStatus, repo
     if (!message) return;
 
     await transporter.sendMail({
-      from: '"FixMyCampus" <fixmycampus@gmail.com>',
+      from: `"FixMyCampus" <${process.env.EMAIL_USER}>`,
       to: reporterEmail,
       subject: `Report Update: "${reportTitle}" is now ${newStatus}`,
       html: `
@@ -36,7 +36,9 @@ const sendStatusUpdateEmail = async (reportTitle, reporterEmail, newStatus, repo
               <strong>New Status: ${newStatus}</strong>
             </div>
             <p style="color: #555;">${message}</p>
-            <p style="color: #999; font-size: 0.85rem;">This is an automated notification from FixMyCampus. Please do not reply to this email.</p>
+            <p style="color: #999; font-size: 0.85rem;">
+              This is an automated notification from FixMyCampus. Please do not reply to this email.
+            </p>
           </div>
         </div>
       `
