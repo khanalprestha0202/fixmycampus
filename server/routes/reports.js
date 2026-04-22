@@ -42,7 +42,7 @@ router.get('/', auth, getAllReports);
 router.get('/:id', auth, getReportById);
 router.post('/', auth, validateReport, createReport);
 router.put('/:id', auth, updateReport);
-router.put('/:id/status', updateStatus);
+router.put('/:id/status', auth, updateStatus);
 router.post('/:id/comments', auth, addComment);
 router.delete('/:id', auth, adminOnly, deleteReport);
 
