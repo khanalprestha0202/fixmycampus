@@ -68,23 +68,42 @@ FixMyCampus is a campus maintenance reporting system for St Mary's University. S
     cd server && npm install
     cd ../client && npm install
 
-**Step 3 - Start backend (Terminal 1)**
+**Step 3 - Create the .env file inside the server folder**
+
+Create a file called `.env` inside the `server` folder with these contents:
+
+    PORT=5000
+    MONGO_URI=mongodb://localhost:27017/fixmycampus
+    JWT_SECRET=fixmycampus_secret_key_2024
+    CLIENT_URL=http://localhost:5173
+    EMAIL_HOST=smtp.ethereal.email
+    EMAIL_PORT=587
+    EMAIL_USER=xngghrn6esflsabn@ethereal.email
+    EMAIL_PASS=bFPcdE21CupKpr38eF
+
+> **Note for assessor:** The MONGO_URI above uses a local MongoDB installation.
+> If you prefer to use MongoDB Atlas (cloud, no installation needed):
+> 1. Create a free cluster at https://cloud.mongodb.com
+> 2. Replace MONGO_URI with your Atlas connection string:
+>    `mongodb+srv://username:password@cluster.mongodb.net/fixmycampus`
+
+**Step 4 - Start backend (Terminal 1)**
 
     cd server
     node index.js
 
 You should see: Server running on port 5000 and MongoDB connected successfully
 
-**Step 4 - Start frontend (Terminal 2)**
+**Step 5 - Start frontend (Terminal 2)**
 
     cd client
     npm run dev
 
-**Step 5 - Open browser**
+**Step 6 - Open browser**
 
     http://localhost:5173
 
-**Step 6 - Register an account at http://localhost:5173/register**
+**Step 7 - Register an account at http://localhost:5173/register**
 
 ---
 
